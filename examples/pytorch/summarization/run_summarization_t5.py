@@ -474,7 +474,7 @@ def main():
         #padding = "max_length" if data_args.pad_to_max_length else False
         #tokens_test = tokenizer.tokenize(inputs[0], max_length=data_args.max_source_length, padding=False, truncation=True)
         #print("TEST: {}\nTOKENIZED: {}".format(inputs[0], tokens_test))
-        import pdb; pdb.set_trace()
+        #import pdb; pdb.set_trace()
 
         # If we are padding here, replace all tokenizer.pad_token_id in the labels by -100 when we want to ignore
         # padding in the loss.
