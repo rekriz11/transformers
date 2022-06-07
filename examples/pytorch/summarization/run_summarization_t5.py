@@ -451,6 +451,7 @@ def main():
     max_target_length = data_args.max_target_length
     print("Max_target_length: {}".format(max_target_length))
     padding = "max_length" if data_args.pad_to_max_length else False
+    print("Padding: {}".format(padding))
 
     if training_args.label_smoothing_factor > 0 and not hasattr(model, "prepare_decoder_input_ids_from_labels"):
         logger.warning(
