@@ -274,10 +274,10 @@ def main():
     else:
         model_args, data_args, training_args = parser.parse_args_into_dataclasses()
     ## Modifying learning rate, max steps, and number of warmup steps
-    training_args.learning_rate = 1e-4
+    training_args.learning_rate = 0.001
     training_args.num_train_epochs=10.0
     training_args.warmup_steps=10000
-    training_args.disable_tqdm=True
+    training_args.disable_tqdm=False
 
     # Setup logging
     logging.basicConfig(
@@ -376,11 +376,11 @@ def main():
         revision=model_args.model_revision,
         use_auth_token=True if model_args.use_auth_token else None,
     )
-    special_tokens = []
-    for i in range(128):
-        special_tokens.append(" <id" + str(i) + ">")
-    special_tokens_dict = {'additional_special_tokens': special_tokens}
-    tokenizer.add_special_tokens(special_tokens_dict)
+    #special_tokens = []
+    #for i in range(128):
+    #    special_tokens.append(" <id" + str(i) + ">")
+    #special_tokens_dict = {'additional_special_tokens': special_tokens}
+    #tokenizer.add_special_tokens(special_tokens_dict)
     model = AutoModelForSeq2SeqLM.from_pretrained(
         model_args.model_name_or_path,
         from_tf=bool(".ckpt" in model_args.model_name_or_path),
@@ -449,9 +449,7 @@ def main():
 
     # Temporarily set max_target_length for training.
     max_target_length = data_args.max_target_length
-    print("Max_target_length: {}".format(max_target_length))
     padding = "max_length" if data_args.pad_to_max_length else False
-    print("Padding: {}".format(padding))
 
     if training_args.label_smoothing_factor > 0 and not hasattr(model, "prepare_decoder_input_ids_from_labels"):
         logger.warning(
@@ -473,6 +471,7 @@ def main():
         #padding = "max_length" if data_args.pad_to_max_length else False
         #tokens_test = tokenizer.tokenize(inputs[0], max_length=data_args.max_source_length, padding=False, truncation=True)
         #print("TEST: {}\nTOKENIZED: {}".format(inputs[0], tokens_test))
+        import pdb; pdb.set_trace()
 
         # If we are padding here, replace all tokenizer.pad_token_id in the labels by -100 when we want to ignore
         # padding in the loss.
