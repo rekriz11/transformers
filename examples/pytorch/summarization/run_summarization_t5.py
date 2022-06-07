@@ -376,11 +376,13 @@ def main():
         revision=model_args.model_revision,
         use_auth_token=True if model_args.use_auth_token else None,
     )
-    #special_tokens = []
-    #for i in range(128):
-    #    special_tokens.append(" <id" + str(i) + ">")
-    #special_tokens_dict = {'additional_special_tokens': special_tokens}
-    #tokenizer.add_special_tokens(special_tokens_dict)
+    ## If there are going to be more extra ids than 100, add them
+    if data_args.max_source_length / 2 > 100:
+        special_tokens = []
+        for i in range(100, data_args.max_source_length / 2):
+            special_tokens.append(" <extra_id_" + str(i) + ">")
+        special_tokens_dict = {'additional_special_tokens': special_tokens}
+        tokenizer.add_special_tokens(special_tokens_dict)
     model = AutoModelForSeq2SeqLM.from_pretrained(
         model_args.model_name_or_path,
         from_tf=bool(".ckpt" in model_args.model_name_or_path),
