@@ -463,17 +463,17 @@ def main():
         inputs = examples[text_column]
         targets = examples[summary_column]
         inputs = [prefix + inp for inp in inputs]
-        model_inputs = tokenizer(inputs, max_length=data_args.max_source_length, padding=padding, truncation=True)
+        model_inputs = tokenizer(inputs, max_length=data_args.max_source_length, padding=False, truncation=True)
 
         # Setup the tokenizer for targets
         with tokenizer.as_target_tokenizer():
-            labels = tokenizer(targets, max_length=max_target_length, padding=padding, truncation=True)
+            labels = tokenizer(targets, max_length=max_target_length, padding=False, truncation=True)
 
         print("Input: {}\nModel input: {}\ntarget: {}\nLabel: {}".format(inputs[0], model_inputs[0], targets[0], labels[0]))
 
         test = ["<id0> What <id1> kind <id2> of <id3> memory <id4> ?"]
         padding = "max_length" if data_args.pad_to_max_length else False
-        tokens_test = tokenizer.tokenize(inputs[0], max_length=data_args.max_source_length, padding=padding, truncation=True)
+        tokens_test = tokenizer.tokenize(inputs[0], max_length=data_args.max_source_length, padding=False, truncation=True)
         print("TEST: {}\nTOKENIZED: {}".format(inputs[0], tokens_test))
         import pdb; pdb.set_trace()
 
