@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # coding=utf-8
-# Copyright {{cookiecutter.authors}} and The HuggingFace Inc. team. All rights reserved.
+# Copyright 2022 {{cookiecutter.authors}} and The HuggingFace Inc. team. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -25,9 +25,10 @@ import math
 import os
 import sys
 from dataclasses import dataclass, field
-from typing import Optional
+from typing import Optional, List
 
 import datasets
+import torch
 from datasets import load_dataset
 
 import transformers
@@ -871,7 +872,8 @@ def main():
 
         model.eval()
         for step, batch in enumerate(eval_dataloader):
-            outputs = model(**batch)
+            with torch.no_grad(): 
+                outputs = model(**batch)
             predictions = outputs.logits.argmax(dim=-1)
             metric.add_batch(
                 predictions=accelerator.gather(predictions),
