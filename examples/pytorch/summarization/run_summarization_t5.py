@@ -378,10 +378,7 @@ def main():
     )
     special_tokens = []
     for i in range(128):
-        if i == 0:
-            special_tokens.append("<id" + str(i) + ">")
-        else:
-            special_tokens.append(" <id" + str(i) + ">")
+        special_tokens.append(" <id" + str(i) + ">")
     special_tokens_dict = {'additional_special_tokens': special_tokens}
     tokenizer.add_special_tokens(special_tokens_dict)
     model = AutoModelForSeq2SeqLM.from_pretrained(
@@ -453,7 +450,7 @@ def main():
     # Temporarily set max_target_length for training.
     max_target_length = data_args.max_target_length
     print("Max_target_length: {}".format(max_target_length))
-    padding = "max_length" if data_args.pad_to_max_length else False
+    padding = "max_length" if data_args.pad_to_max_length else False;
 
     if training_args.label_smoothing_factor > 0 and not hasattr(model, "prepare_decoder_input_ids_from_labels"):
         logger.warning(
@@ -472,6 +469,11 @@ def main():
             labels = tokenizer(targets, max_length=max_target_length, padding=padding, truncation=True)
 
         print("Input: {}\nModel input: {}\ntarget: {}\nLabel: {}".format(inputs[0], model_inputs[0], targets[0], labels[0]))
+
+        test = ["<id0> What <id1> kind <id2> of <id3> memory <id4> ?"]
+        padding = "max_length" if data_args.pad_to_max_length else False
+        tokens_test = tokenizer.tokenize(inputs[0], max_length=data_args.max_source_length, padding=padding, truncation=True)
+        print("TEST: {}\nTOKENIZED: {}".format(inputs[0], tokens_test))
         import pdb; pdb.set_trace()
 
         # If we are padding here, replace all tokenizer.pad_token_id in the labels by -100 when we want to ignore
