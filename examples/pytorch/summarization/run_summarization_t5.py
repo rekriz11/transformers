@@ -20,6 +20,7 @@ Fine-tuning the library models for sequence to sequence.
 
 import logging
 import os
+os.environ["WANDB_DISABLED"] = "true"
 import sys
 from dataclasses import dataclass, field
 from typing import Optional
@@ -189,18 +190,6 @@ class DataTrainingArguments:
             "value if set."
         },
     )
-    max_steps: Optional[int] = field(
-        default=-1,
-        metadata={
-            "help": "If > 0: set total number of training steps to perform. Override num_train_epochs. (default: -1)"
-        },
-    )
-    warmup_steps: Optional[int] = field(
-        default=0,
-        metadata={
-            "Linear warmup over warmup_steps. (default: 0)"
-        },
-    )
     max_eval_samples: Optional[int] = field(
         default=None,
         metadata={
@@ -231,6 +220,17 @@ class DataTrainingArguments:
     source_prefix: Optional[str] = field(
         default=None, metadata={"help": "A prefix to add before every source text (useful for T5 models)."}
     )
+    '''
+    max_steps: Optional[int] = field(
+        default=-1, metadata={"help": "If > 0: set total number of training steps to perform. Override num_train_epochs. (default: -1)"},
+    )
+    warmup_steps: Optional[int] = field(
+        default=0, metadata={"Linear warmup over warmup_steps. (default: 0)"},
+    )
+    learning_rate: Optional[float] = field(
+        default=5e-5, metadata={"The initial learning rate for AdamW optimizer. (default: 5e-5)"},
+    )
+    '''
 
     def __post_init__(self):
         if self.dataset_name is None and self.train_file is None and self.validation_file is None:
@@ -273,6 +273,11 @@ def main():
         model_args, data_args, training_args = parser.parse_json_file(json_file=os.path.abspath(sys.argv[1]))
     else:
         model_args, data_args, training_args = parser.parse_args_into_dataclasses()
+    ## Modifying learning rate, max steps, and number of warmup steps
+    training_args.learning_rate = 1e-4
+    training_args.num_train_epochs=10.0
+    training_args.warmup_steps=10000
+    training_args.disable_tqdm=True
 
     # Setup logging
     logging.basicConfig(
@@ -371,6 +376,14 @@ def main():
         revision=model_args.model_revision,
         use_auth_token=True if model_args.use_auth_token else None,
     )
+    special_tokens = []
+    for i in range(128):
+        special_tokens.append("<id" + str(i) + ">")
+    tokenizer.add_special_tokens(special_tokens)
+    test = ["<id_0> What <id_1> kind <id_2> of <id_3> memory <id_4> ?"]
+    tokens_test = tokenizer(test, max_length=data_args.max_source_length, padding=padding, truncation=True)
+    print("TEST: {}\nTOKENIZED: {}".format(test, tokens_test))
+    import pdb; pdb.set_trace()
     model = AutoModelForSeq2SeqLM.from_pretrained(
         model_args.model_name_or_path,
         from_tf=bool(".ckpt" in model_args.model_name_or_path),
