@@ -468,9 +468,7 @@ def main():
         # Setup the tokenizer for targets
         with tokenizer.as_target_tokenizer():
             labels = tokenizer(targets, max_length=max_target_length, padding=False, truncation=True)
-
-        print("Input: {}\nModel input: {}\ntarget: {}\nLabel: {}".format(inputs[0], model_inputs[0], targets[0], labels[0]))
-
+        #print("Input: {}\nModel input: {}\ntarget: {}\nLabel: {}".format(inputs[0], model_inputs[0], targets[0], labels[0]))
         #test = ["<id0> What <id1> kind <id2> of <id3> memory <id4> ?"]
         #padding = "max_length" if data_args.pad_to_max_length else False
         #tokens_test = tokenizer.tokenize(inputs[0], max_length=data_args.max_source_length, padding=False, truncation=True)
