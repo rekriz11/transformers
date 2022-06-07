@@ -277,7 +277,7 @@ def main():
     training_args.learning_rate = 0.001
     training_args.num_train_epochs=10.0
     training_args.warmup_steps=10000
-    training_args.disable_tqdm=False
+    training_args.disable_tqdm=True
 
     # Setup logging
     logging.basicConfig(
