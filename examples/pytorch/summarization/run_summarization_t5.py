@@ -379,7 +379,8 @@ def main():
     special_tokens = []
     for i in range(128):
         special_tokens.append("<id" + str(i) + ">")
-    tokenizer.add_special_tokens(special_tokens)
+    special_tokens_dict = {'additional_special_tokens': special_tokens}
+    tokenizer.add_special_tokens(special_tokens_dict)
     test = ["<id0> What <id1> kind <id2> of <id3> memory <id4> ?"]
     tokens_test = tokenizer(test, max_length=data_args.max_source_length, padding=padding, truncation=True)
     print("TEST: {}\nTOKENIZED: {}".format(test, tokens_test))
