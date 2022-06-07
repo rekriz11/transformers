@@ -295,7 +295,7 @@ def main():
     # Log on each process the small summary:
     logger.warning(
         f"Process rank: {training_args.local_rank}, device: {training_args.device}, n_gpu: {training_args.n_gpu}"
-        + f"distributed training: {bool(training_args.local_rank != -1)}, 16-bits training: {training_args.fp16}"
+        + f", distributed training: {bool(training_args.local_rank != -1)}, 16-bits training: {training_args.fp16}"
     )
     logger.info(f"Training/evaluation parameters {training_args}")
 
@@ -384,11 +384,6 @@ def main():
             special_tokens.append(" <id" + str(i) + ">")
     special_tokens_dict = {'additional_special_tokens': special_tokens}
     tokenizer.add_special_tokens(special_tokens_dict)
-    test = ["<id0> What <id1> kind <id2> of <id3> memory <id4> ?"]
-    padding = "max_length" if data_args.pad_to_max_length else False
-    tokens_test = tokenizer(test, max_length=data_args.max_source_length, padding=padding, truncation=True)
-    print("TEST: {}\nTOKENIZED: {}".format(test, tokens_test))
-    import pdb; pdb.set_trace()
     model = AutoModelForSeq2SeqLM.from_pretrained(
         model_args.model_name_or_path,
         from_tf=bool(".ckpt" in model_args.model_name_or_path),
@@ -457,6 +452,7 @@ def main():
 
     # Temporarily set max_target_length for training.
     max_target_length = data_args.max_target_length
+    print("Max_target_length: {}".format(max_target_length))
     padding = "max_length" if data_args.pad_to_max_length else False
 
     if training_args.label_smoothing_factor > 0 and not hasattr(model, "prepare_decoder_input_ids_from_labels"):
@@ -474,6 +470,9 @@ def main():
         # Setup the tokenizer for targets
         with tokenizer.as_target_tokenizer():
             labels = tokenizer(targets, max_length=max_target_length, padding=padding, truncation=True)
+
+        print("Input: {}\nModel input: {}\ntarget: {}\nLabel: {}".format(inputs[0], model_inputs[0], targets[0], labels[0]))
+        import pdb; pdb.set_trace()
 
         # If we are padding here, replace all tokenizer.pad_token_id in the labels by -100 when we want to ignore
         # padding in the loss.
