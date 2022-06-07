@@ -381,7 +381,7 @@ def main():
         if i == 0:
             special_tokens.append("<id" + str(i) + ">")
         else:
-            special_tokens.append("▁<id" + str(i) + ">")
+            special_tokens.append(" <id" + str(i) + ">")
     special_tokens_dict = {'additional_special_tokens': special_tokens}
     tokenizer.add_special_tokens(special_tokens_dict)
     test = ["<id0> What <id1> kind <id2> of <id3> memory <id4> ?"]
