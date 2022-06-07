@@ -378,8 +378,9 @@ def main():
     )
     ## If there are going to be more extra ids than 100, add them
     if data_args.max_source_length / 2 > 100:
+        print("Max source length: {}".format(data_args.max_source_length))
         special_tokens = []
-        for i in range(100, data_args.max_source_length / 2):
+        for i in range(100, round(data_args.max_source_length / 2)):
             special_tokens.append(" <extra_id_" + str(i) + ">")
         special_tokens_dict = {'additional_special_tokens': special_tokens}
         tokenizer.add_special_tokens(special_tokens_dict)
