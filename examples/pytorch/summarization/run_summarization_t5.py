@@ -273,10 +273,7 @@ def main():
         model_args, data_args, training_args = parser.parse_json_file(json_file=os.path.abspath(sys.argv[1]))
     else:
         model_args, data_args, training_args = parser.parse_args_into_dataclasses()
-
     print("###### NUMBER OF GPUS: {} ####\n".format(training_args.n_gpu))
-    training_args.n_gpu = 8
-    print("###### UPDATED NUMBER OF GPUS: {} ####".format(training_args.n_gpu))
     ## Modifying learning rate, max steps, and number of warmup steps
     training_args.learning_rate = 0.001
     training_args.num_train_epochs=10.0
