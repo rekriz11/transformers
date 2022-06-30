@@ -759,6 +759,13 @@ class TFData2VecVisionForImageClassification(metaclass=DummyObject):
         requires_backends(self, ["tf"])
 
 
+class TFData2VecVisionForSemanticSegmentation(metaclass=DummyObject):
+    _backends = ["tf"]
+
+    def __init__(self, *args, **kwargs):
+        requires_backends(self, ["tf"])
+
+
 class TFData2VecVisionModel(metaclass=DummyObject):
     _backends = ["tf"]
 
@@ -1683,6 +1690,30 @@ class TFRagSequenceForGeneration(metaclass=DummyObject):
 
 
 class TFRagTokenForGeneration(metaclass=DummyObject):
+    _backends = ["tf"]
+
+    def __init__(self, *args, **kwargs):
+        requires_backends(self, ["tf"])
+
+
+TF_REGNET_PRETRAINED_MODEL_ARCHIVE_LIST = None
+
+
+class TFRegNetForImageClassification(metaclass=DummyObject):
+    _backends = ["tf"]
+
+    def __init__(self, *args, **kwargs):
+        requires_backends(self, ["tf"])
+
+
+class TFRegNetModel(metaclass=DummyObject):
+    _backends = ["tf"]
+
+    def __init__(self, *args, **kwargs):
+        requires_backends(self, ["tf"])
+
+
+class TFRegNetPreTrainedModel(metaclass=DummyObject):
     _backends = ["tf"]
 
     def __init__(self, *args, **kwargs):
