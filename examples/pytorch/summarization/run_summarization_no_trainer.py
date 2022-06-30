@@ -50,7 +50,7 @@ from transformers import (
     SchedulerType,
     get_scheduler,
 )
-from transformers.utils import get_full_repo_name, is_offline_mode, send_example_telemetry
+from transformers.utils.hub import get_full_repo_name, is_offline_mode, send_example_telemetry
 from transformers.utils.versions import require_version
 
 
