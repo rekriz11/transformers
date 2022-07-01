@@ -599,7 +599,7 @@ def main():
     logger.info(f"  Total optimization steps = {args.max_train_steps}")
     logger.info(f"  Checkpoint steps = {checkpointing_steps}")
     # Only show the progress bar once on each machine.
-    progress_bar = tqdm(range(args.max_train_steps), disable=not accelerator.is_local_main_process)
+    #progress_bar = tqdm(range(args.max_train_steps), disable=not accelerator.is_local_main_process)
     completed_steps = 0
     starting_epoch = 0
     # Potentially load in the weights and states from a previous save
@@ -634,6 +634,9 @@ def main():
                 if resume_step is not None and step < resume_step:
                     completed_steps += 1
                     continue
+
+            if step %% 100 == 0:
+                print("Training step {}".format(completed_steps))
             outputs = model(**batch)
             loss = outputs.loss
             # We keep track of the loss at each epoch
@@ -645,7 +648,7 @@ def main():
                 optimizer.step()
                 lr_scheduler.step()
                 optimizer.zero_grad()
-                progress_bar.update(1)
+                #progress_bar.update(1)
                 completed_steps += 1
 
             if isinstance(checkpointing_steps, int):
@@ -657,6 +660,7 @@ def main():
 
             if completed_steps >= args.max_train_steps:
                 break
+        print("\nFinished epoch {}\n".format(epoch))
 
         model.eval()
         if args.val_max_target_length is None:
@@ -668,6 +672,8 @@ def main():
         }
         samples_seen = 0
         for step, batch in enumerate(eval_dataloader):
+            if step %% 100 == 0:
+                print("Validation step: {}".format(step))
             with torch.no_grad():
                 generated_tokens = accelerator.unwrap_model(model).generate(
                     batch["input_ids"],
@@ -720,7 +726,8 @@ def main():
             result["train_loss"] = total_loss.item() / len(train_dataloader)
             result["epoch"] = epoch
             result["step"] = completed_steps
-            accelerator.log(result, step=completed_steps)
+            #accelerator.log(result, step=completed_steps)
+            print("\nEval: {}".format(result))
 
         if args.push_to_hub and epoch < args.num_train_epochs - 1:
             accelerator.wait_for_everyone()
@@ -735,6 +742,7 @@ def main():
                 )
 
         if args.checkpointing_steps == "epoch":
+            print("\nSaving model at epoch {} end...".format(epoch))
             output_dir = f"epoch_{epoch}"
             if args.output_dir is not None:
                 output_dir = os.path.join(args.output_dir, output_dir)
