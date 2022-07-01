@@ -24,6 +24,7 @@ import logging
 import math
 import os
 import random
+import time
 from pathlib import Path
 
 import datasets
@@ -319,7 +320,8 @@ def parse_args():
 
 def main():
     args = parse_args()
-    print("OUTPUT_DIR: {}".format(args.output_dir))
+    if accelerator.is_main_process:
+        print("OUTPUT_DIR: {}".format(args.output_dir))
     # Sending telemetry. Tracking the example usage helps us better allocate resources to maintain them. The
     # information sent is the one passed as arguments along with your Python/PyTorch versions.
     send_example_telemetry("run_summarization_no_trainer", args)
