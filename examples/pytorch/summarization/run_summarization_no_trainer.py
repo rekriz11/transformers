@@ -503,7 +503,6 @@ def main():
 
     if accelerator.is_main_process:
         print("Processed datasets: \n{}".format(processed_datasets))
-    import pdb; pdb.set_trace()
     train_dataset = processed_datasets["train"]
     eval_dataset = processed_datasets["validation"]
 
