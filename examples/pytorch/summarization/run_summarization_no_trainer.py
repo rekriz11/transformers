@@ -319,9 +319,9 @@ def parse_args():
 
 def main():
     args = parse_args()
+    print("OUTPUT_DIR: {}".format(args.output_dir))
     # Sending telemetry. Tracking the example usage helps us better allocate resources to maintain them. The
     # information sent is the one passed as arguments along with your Python/PyTorch versions.
-    print("\n\n######TRAIN BATCH SIZE: {}#######\n\n".format(args.per_device_train_batch_size))
     send_example_telemetry("run_summarization_no_trainer", args)
 
     # Initialize the accelerator. We will let the accelerator handle device placement for us in this example.
