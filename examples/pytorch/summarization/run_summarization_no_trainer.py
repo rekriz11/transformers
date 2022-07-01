@@ -320,8 +320,6 @@ def parse_args():
 
 def main():
     args = parse_args()
-    if accelerator.is_main_process:
-        print("OUTPUT_DIR: {}".format(args.output_dir))
     # Sending telemetry. Tracking the example usage helps us better allocate resources to maintain them. The
     # information sent is the one passed as arguments along with your Python/PyTorch versions.
     send_example_telemetry("run_summarization_no_trainer", args)
@@ -350,6 +348,8 @@ def main():
         level=logging.INFO,
     )
     logger.info(accelerator.state, main_process_only=False)
+    if accelerator.is_main_process:
+        print("OUTPUT_DIR: {}".format(args.output_dir))
     if accelerator.is_local_main_process:
         datasets.utils.logging.set_verbosity_warning()
         transformers.utils.logging.set_verbosity_info()
