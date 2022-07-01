@@ -399,9 +399,9 @@ def main():
             data_files["validation"] = args.validation_file
         extension = args.train_file.split(".")[-1]
         raw_datasets = load_dataset(extension, data_files=data_files)
-        print("data files: {}".format(data_files))
-        print(raw_datasets)
-        print(raw_datasets["train"].column_names)
+        if accelerator.is_main_process:
+            print("data files: {}".format(data_files))
+            print("raw_datasets: {}".format(raw_datasets))
     # See more about loading any type of standard or custom dataset (from files, python dict, pandas DataFrame, etc) at
     # https://huggingface.co/docs/datasets/loading_datasets.html.
 
@@ -501,7 +501,8 @@ def main():
             desc="Running tokenizer on dataset",
         )
 
-    print("Processed datasets: \n{}".format(processed_datasets))
+    if accelerator.is_main_process:
+        print("Processed datasets: \n{}".format(processed_datasets))
     import pdb; pdb.set_trace()
     train_dataset = processed_datasets["train"]
     eval_dataset = processed_datasets["validation"]
