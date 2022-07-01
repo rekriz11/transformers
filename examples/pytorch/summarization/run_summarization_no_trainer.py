@@ -640,13 +640,13 @@ def main():
             outputs = model(**batch)
             loss = outputs.loss
             # We keep track of the loss at each epoch
+            loss = loss / args.gradient_accumulation_steps
             if args.with_tracking:
                 total_loss += loss.detach().float()
                 if step % 100 == 0 and step > 0 and accelerator.is_main_process:
                     cur_time = round(time.time() - start_time)
                     print("Epoch {}, training step {} out of {} after {} seconds, loss: {}".format(epoch, \
                         completed_steps, all_train_steps, cur_time, loss.detach().float()))
-            loss = loss / args.gradient_accumulation_steps
             accelerator.backward(loss)
             if step % args.gradient_accumulation_steps == 0 or step == len(train_dataloader) - 1:
                 optimizer.step()
@@ -735,7 +735,7 @@ def main():
             result["step"] = completed_steps
             #accelerator.log(result, step=completed_steps)
             if accelerator.is_main_process:
-                print("\nEval: {}".format(result))
+                print("\n\n####Eval for epoch {}: {}#####\n\n".format(epoch, result))
 
         if args.push_to_hub and epoch < args.num_train_epochs - 1:
             accelerator.wait_for_everyone()
