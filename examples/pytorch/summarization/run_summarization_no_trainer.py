@@ -634,8 +634,7 @@ def main():
                 if resume_step is not None and step < resume_step:
                     completed_steps += 1
                     continue
-
-            if step %% 100 == 0:
+            if step % 100 == 0:
                 print("Training step {}".format(completed_steps))
             outputs = model(**batch)
             loss = outputs.loss
@@ -672,7 +671,7 @@ def main():
         }
         samples_seen = 0
         for step, batch in enumerate(eval_dataloader):
-            if step %% 100 == 0:
+            if step % 100 == 0:
                 print("Validation step: {}".format(step))
             with torch.no_grad():
                 generated_tokens = accelerator.unwrap_model(model).generate(
