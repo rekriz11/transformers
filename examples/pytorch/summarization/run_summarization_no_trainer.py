@@ -626,6 +626,7 @@ def main():
             starting_epoch = resume_step // len(train_dataloader)
             resume_step -= starting_epoch * len(train_dataloader)
     start_time = time.time()
+    all_train_steps = args.num_train_epochs * len(train_dataloader)
     for epoch in range(starting_epoch, args.num_train_epochs):
         model.train()
         if args.with_tracking:
@@ -635,15 +636,16 @@ def main():
             if args.resume_from_checkpoint and epoch == starting_epoch:
                 if resume_step is not None and step < resume_step:
                     completed_steps += 1
-                    continue
-            if step % 100 == 0 and accelerator.is_main_process:
-                cur_time = round(time.time() - start_time)
-                print("Training step {} after {} seconds".format(completed_steps, cur_time))
+                    continue                
             outputs = model(**batch)
             loss = outputs.loss
             # We keep track of the loss at each epoch
             if args.with_tracking:
                 total_loss += loss.detach().float()
+                if step % 100 == 0 and step > 0 and accelerator.is_main_process:
+                    cur_time = round(time.time() - start_time)
+                    print("Epoch {}, training step {} out of {} after {} seconds, loss: {}".format(epoch, \
+                        completed_steps, all_train_steps, cur_time, loss.detach().float()))
             loss = loss / args.gradient_accumulation_steps
             accelerator.backward(loss)
             if step % args.gradient_accumulation_steps == 0 or step == len(train_dataloader) - 1:
@@ -674,10 +676,11 @@ def main():
             "num_beams": args.num_beams,
         }
         samples_seen = 0
+
         for step, batch in enumerate(eval_dataloader):
             if step % 10 == 0 and accelerator.is_main_process:
                 cur_time = round(time.time() - start_time)
-                print("Validation step {} after {} seconds".format(step, cur_time))
+                print("Epoch {}, Validation step {} out of {} after {} seconds".format(epoch, step, len(eval_dataloader), cur_time))
             with torch.no_grad():
                 generated_tokens = accelerator.unwrap_model(model).generate(
                     batch["input_ids"],
