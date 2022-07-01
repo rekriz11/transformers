@@ -623,7 +623,7 @@ def main():
             resume_step = int(training_difference.replace("step_", ""))
             starting_epoch = resume_step // len(train_dataloader)
             resume_step -= starting_epoch * len(train_dataloader)
-
+    start_time = time.time()
     for epoch in range(starting_epoch, args.num_train_epochs):
         model.train()
         if args.with_tracking:
@@ -634,8 +634,9 @@ def main():
                 if resume_step is not None and step < resume_step:
                     completed_steps += 1
                     continue
-            if step % 100 == 0:
-                print("Training step {}".format(completed_steps))
+            if step % 100 == 0 and accelerator.is_main_process:
+                cur_time = round(time.time() - start_time)
+                print("Training step {} after {} seconds".format(completed_steps, cur_time))
             outputs = model(**batch)
             loss = outputs.loss
             # We keep track of the loss at each epoch
@@ -659,7 +660,8 @@ def main():
 
             if completed_steps >= args.max_train_steps:
                 break
-        print("\nFinished epoch {}\n".format(epoch))
+        if accelerator.is_main_process:
+            print("\nFinished epoch {}\n".format(epoch))
 
         model.eval()
         if args.val_max_target_length is None:
@@ -671,8 +673,9 @@ def main():
         }
         samples_seen = 0
         for step, batch in enumerate(eval_dataloader):
-            if step % 100 == 0:
-                print("Validation step: {}".format(step))
+            if step % 10 == 0 and accelerator.is_main_process:
+                cur_time = round(time.time() - start_time)
+                print("Validation step {} after {} seconds".format(step, cur_time))
             with torch.no_grad():
                 generated_tokens = accelerator.unwrap_model(model).generate(
                     batch["input_ids"],
@@ -726,7 +729,8 @@ def main():
             result["epoch"] = epoch
             result["step"] = completed_steps
             #accelerator.log(result, step=completed_steps)
-            print("\nEval: {}".format(result))
+            if accelerator.is_main_process:
+                print("\nEval: {}".format(result))
 
         if args.push_to_hub and epoch < args.num_train_epochs - 1:
             accelerator.wait_for_everyone()
