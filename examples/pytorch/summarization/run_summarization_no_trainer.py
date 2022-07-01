@@ -401,7 +401,7 @@ def main():
         raw_datasets = load_dataset(extension, data_files=data_files)
         print("data files: {}".format(data_files))
         print(raw_datasets)
-        import pdb; pdb.set_trace()
+        print(raw_datasets["train"].column_names)
     # See more about loading any type of standard or custom dataset (from files, python dict, pandas DataFrame, etc) at
     # https://huggingface.co/docs/datasets/loading_datasets.html.
 
@@ -491,6 +491,7 @@ def main():
         return model_inputs
 
     with accelerator.main_process_first():
+        print("Overwrite cache? {}".format(args.overwrite_cache))
         processed_datasets = raw_datasets.map(
             preprocess_function,
             batched=True,
@@ -500,6 +501,8 @@ def main():
             desc="Running tokenizer on dataset",
         )
 
+    print("Processed datasets: \n{}".format(processed_datasets))
+    import pdb; pdb.set_trace()
     train_dataset = processed_datasets["train"]
     eval_dataset = processed_datasets["validation"]
 
