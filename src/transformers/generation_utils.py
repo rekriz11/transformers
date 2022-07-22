@@ -888,6 +888,7 @@ class GenerationMixin:
         slot_constraints: Optional[List[torch.tensor]] = None,
         valid_input: Optional[torch.tensor] = None,
         empty_answer: Optional[torch.tensor] = None,
+        delimiter: Optional[torch.tensor] = None,
         tokenizer: Optional = None,
         **model_kwargs,
     ) -> Union[GreedySearchOutput, SampleOutput, BeamSearchOutput, BeamSampleOutput, torch.LongTensor]:
@@ -1124,7 +1125,7 @@ class GenerationMixin:
         >>> tokenizer.batch_decode(outputs, skip_special_tokens=True)
         ['Paris ist eines der dichtesten besiedelten Gebiete Europas.']
         ```"""
-        import pdb; pdb.set_trace()
+
         # 1. Set generation parameters if not already defined
         bos_token_id = bos_token_id if bos_token_id is not None else self.config.bos_token_id
         num_beams = num_beams if num_beams is not None else self.config.num_beams
