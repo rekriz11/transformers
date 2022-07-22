@@ -2023,7 +2023,8 @@ class GenerationMixin:
             next_tokens_scores = logits_processor(input_ids, next_token_logits)
             print("next_tokens_scores: {}".format(next_tokens_scores))
             ## Added function for constrained decoding
-            next_tokens_scores = self.set_scores_to_inf_for_invalid_canidates(self, next_tokens_scores, input_ids, slot_constraints, valid_input, empty_answer, delimiter)
+            next_tokens_scores = self.set_scores_to_inf_for_invalid_canidates(next_tokens_scores, input_ids, \
+                slot_constraints, valid_input, empty_answer, delimiter)
             
             # Store scores, attentions and hidden_states when required
             if return_dict_in_generate:
