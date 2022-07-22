@@ -1285,7 +1285,6 @@ class GenerationMixin:
         )
 
         print("About to generate...")
-        import pdb; pdb.set_trace();
 
         # 9. go into different generation modes
         if is_greedy_gen_mode:
@@ -1304,6 +1303,11 @@ class GenerationMixin:
                 output_scores=output_scores,
                 return_dict_in_generate=return_dict_in_generate,
                 synced_gpus=synced_gpus,
+                slot_constraints=slot_constraints,
+                valid_input=valid_input,
+                empty_answer=empty_answer,
+                delimiter=delimiter,
+                tokenizer=tokenizer,
                 **model_kwargs,
             )
 
@@ -1552,6 +1556,11 @@ class GenerationMixin:
         output_scores: Optional[bool] = None,
         return_dict_in_generate: Optional[bool] = None,
         synced_gpus: Optional[bool] = False,
+        slot_constraints: Optional[List[torch.tensor]] = None,
+        valid_input: Optional[torch.tensor] = None,
+        empty_answer: Optional[torch.tensor] = None,
+        delimiter: Optional[torch.tensor] = None,
+        tokenizer: Optional = None,
         **model_kwargs,
     ) -> Union[GreedySearchOutput, torch.LongTensor]:
         r"""
@@ -1705,6 +1714,8 @@ class GenerationMixin:
 
             # pre-process distribution
             next_tokens_scores = logits_processor(input_ids, next_token_logits)
+            print("next_tokens_scores: ".format(next_tokens_scores))
+            import pdb; pdb.set_trace()
 
             # Store scores, attentions and hidden_states when required
             if return_dict_in_generate:
