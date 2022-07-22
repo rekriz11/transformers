@@ -887,7 +887,7 @@ class GenerationMixin:
         exponential_decay_length_penalty: Optional[Tuple[Union[int, float]]] = None,
         slot_constraints: Optional[List[torch.tensor]] = None,
         valid_input: Optional[torch.tensor] = None,
-        empty_answer: Optional[torch.tensor] = None
+        empty_answer: Optional[torch.tensor] = None,
         **model_kwargs,
     ) -> Union[GreedySearchOutput, SampleOutput, BeamSearchOutput, BeamSampleOutput, torch.LongTensor]:
         r"""
