@@ -232,6 +232,7 @@ class BatchEncoding(UserDict):
 
         If the key is an integer, get the `tokenizers.Encoding` for batch item with index `key`.
         """
+        print("Item: {}".format(item))
         if isinstance(item, str):
             return self.data[item]
         elif self._encodings is not None:
