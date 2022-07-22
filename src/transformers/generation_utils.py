@@ -1544,10 +1544,9 @@ class GenerationMixin:
             )
 
     ## Added constrained generation helper to only allow generation of valid candidates after delimiter
-    def set_scores_to_inf_for_invalid_canidates(self, scores, tokens, forced_constraints, input, empty_answer, delimiter):
+    def set_scores_to_inf_for_invalid_canidates(self, scores, input_ids, forced_constraints, input, empty_answer, delimiter):
         forced_cands, generated_forced_cands = [0 for i in range(scores.shape[0])], [[] for i in range(scores.shape[0])]
-        empty_slot = empty_answer.item()
-        print("Empty slot: {}".format(empty_slot))
+        import pdb; pdb.set_trace()
         for beam_idx in range(scores.shape[0]):
             cur_tokens = tokens[beam_idx].tolist()
 
@@ -2023,6 +2022,7 @@ class GenerationMixin:
             # pre-process distribution
             next_tokens_scores = logits_processor(input_ids, next_token_logits)
             print("next_tokens_scores: {}".format(next_tokens_scores))
+            set_scores_to_inf_for_invalid_canidates(self, next_tokens_scores, input_ids, slot_constraints, valid_input, empty_answer, delimiter)
             
             # Store scores, attentions and hidden_states when required
             if return_dict_in_generate:
@@ -2045,7 +2045,7 @@ class GenerationMixin:
             # argmax
             next_tokens = torch.argmax(next_tokens_scores, dim=-1)
             print("next_tokens: {}".format(next_tokens))
-            
+
             # finished sentences should have their next token be a padding token
             if eos_token_id is not None:
                 if pad_token_id is None:
