@@ -2024,7 +2024,6 @@ class GenerationMixin:
             next_tokens_scores = logits_processor(input_ids, next_token_logits)
             print("next_tokens_scores: {}".format(next_tokens_scores))
             
-
             # Store scores, attentions and hidden_states when required
             if return_dict_in_generate:
                 if output_scores:
@@ -2046,8 +2045,7 @@ class GenerationMixin:
             # argmax
             next_tokens = torch.argmax(next_tokens_scores, dim=-1)
             print("next_tokens: {}".format(next_tokens))
-            import pdb; pdb.set_trace()
-
+            
             # finished sentences should have their next token be a padding token
             if eos_token_id is not None:
                 if pad_token_id is None:
@@ -2071,6 +2069,8 @@ class GenerationMixin:
                     break
                 else:
                     this_peer_finished = True
+
+            import pdb; pdb.set_trace()
 
         if return_dict_in_generate:
             if self.config.is_encoder_decoder:
