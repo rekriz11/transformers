@@ -1548,7 +1548,8 @@ class GenerationMixin:
         forced_cands, generated_forced_cands = [0 for i in range(scores.shape[0])], [[] for i in range(scores.shape[0])]
         import pdb; pdb.set_trace()
         for beam_idx in range(scores.shape[0]):
-            cur_tokens = tokens[beam_idx].tolist()
+            cur_tokens = input_ids[beam_idx].tolist()
+
 
 
     '''
@@ -1963,6 +1964,7 @@ class GenerationMixin:
             stopping_criteria = validate_stopping_criteria(stopping_criteria, max_length)
         pad_token_id = pad_token_id if pad_token_id is not None else self.config.pad_token_id
         eos_token_id = eos_token_id if eos_token_id is not None else self.config.eos_token_id
+        print("EOS_TOKEN_ID: {}".format(eos_token_id))
         output_scores = output_scores if output_scores is not None else self.config.output_scores
         output_attentions = output_attentions if output_attentions is not None else self.config.output_attentions
         output_hidden_states = (
