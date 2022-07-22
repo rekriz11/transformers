@@ -841,7 +841,7 @@ class GenerationMixin:
 
         return transition_scores
 
-    ## Added arguments: slot constraints, valid input, empty answer
+    ## Added arguments: slot constraints, valid input, empty answer, tokenizer
     @torch.no_grad()
     def generate(
         self,
@@ -888,6 +888,7 @@ class GenerationMixin:
         slot_constraints: Optional[List[torch.tensor]] = None,
         valid_input: Optional[torch.tensor] = None,
         empty_answer: Optional[torch.tensor] = None,
+        tokenizer: Optional = None,
         **model_kwargs,
     ) -> Union[GreedySearchOutput, SampleOutput, BeamSearchOutput, BeamSampleOutput, torch.LongTensor]:
         r"""
