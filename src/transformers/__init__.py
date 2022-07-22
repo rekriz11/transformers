@@ -266,12 +266,20 @@ _import_structure = {
     "models.mt5": ["MT5Config"],
     "models.mvp": ["MvpConfig", "MvpTokenizer"],
     "models.nezha": ["NEZHA_PRETRAINED_CONFIG_ARCHIVE_MAP", "NezhaConfig"],
+    "models.nllb": [],
     "models.nystromformer": [
         "NYSTROMFORMER_PRETRAINED_CONFIG_ARCHIVE_MAP",
         "NystromformerConfig",
     ],
     "models.openai": ["OPENAI_GPT_PRETRAINED_CONFIG_ARCHIVE_MAP", "OpenAIGPTConfig", "OpenAIGPTTokenizer"],
     "models.opt": ["OPTConfig"],
+    "models.owlvit": [
+        "OWLVIT_PRETRAINED_CONFIG_ARCHIVE_MAP",
+        "OwlViTConfig",
+        "OwlViTProcessor",
+        "OwlViTTextConfig",
+        "OwlViTVisionConfig",
+    ],
     "models.pegasus": ["PEGASUS_PRETRAINED_CONFIG_ARCHIVE_MAP", "PegasusConfig", "PegasusTokenizer"],
     "models.perceiver": ["PERCEIVER_PRETRAINED_CONFIG_ARCHIVE_MAP", "PerceiverConfig", "PerceiverTokenizer"],
     "models.phobert": ["PhobertTokenizer"],
@@ -479,6 +487,7 @@ else:
     _import_structure["models.m2m_100"].append("M2M100Tokenizer")
     _import_structure["models.marian"].append("MarianTokenizer")
     _import_structure["models.mbart"].append("MBartTokenizer")
+    _import_structure["models.nllb"].append("NllbTokenizer")
     _import_structure["models.mbart50"].append("MBart50Tokenizer")
     _import_structure["models.mluke"].append("MLukeTokenizer")
     _import_structure["models.mt5"].append("MT5Tokenizer")
@@ -543,6 +552,7 @@ else:
     _import_structure["models.mpnet"].append("MPNetTokenizerFast")
     _import_structure["models.mt5"].append("MT5TokenizerFast")
     _import_structure["models.mvp"].append("MvpTokenizerFast")
+    _import_structure["models.nllb"].append("NllbTokenizerFast")
     _import_structure["models.openai"].append("OpenAIGPTTokenizerFast")
     _import_structure["models.pegasus"].append("PegasusTokenizerFast")
     _import_structure["models.realm"].append("RealmTokenizerFast")
@@ -638,6 +648,7 @@ else:
     _import_structure["models.levit"].append("LevitFeatureExtractor")
     _import_structure["models.maskformer"].append("MaskFormerFeatureExtractor")
     _import_structure["models.mobilevit"].append("MobileViTFeatureExtractor")
+    _import_structure["models.owlvit"].append("OwlViTFeatureExtractor")
     _import_structure["models.perceiver"].append("PerceiverFeatureExtractor")
     _import_structure["models.poolformer"].append("PoolFormerFeatureExtractor")
     _import_structure["models.segformer"].append("SegformerFeatureExtractor")
@@ -1501,6 +1512,17 @@ else:
             "OPTForCausalLM",
             "OPTModel",
             "OPTPreTrainedModel",
+            "OPTForSequenceClassification",
+        ]
+    )
+    _import_structure["models.owlvit"].extend(
+        [
+            "OWLVIT_PRETRAINED_MODEL_ARCHIVE_LIST",
+            "OwlViTModel",
+            "OwlViTPreTrainedModel",
+            "OwlViTTextModel",
+            "OwlViTVisionModel",
+            "OwlViTForObjectDetection",
         ]
     )
     _import_structure["models.pegasus"].extend(
@@ -2167,6 +2189,16 @@ else:
             "TFDebertaV2PreTrainedModel",
         ]
     )
+    _import_structure["models.deit"].extend(
+        [
+            "TF_DEIT_PRETRAINED_MODEL_ARCHIVE_LIST",
+            "TFDeiTForImageClassification",
+            "TFDeiTForImageClassificationWithTeacher",
+            "TFDeiTForMaskedImageModeling",
+            "TFDeiTModel",
+            "TFDeiTPreTrainedModel",
+        ]
+    )
     _import_structure["models.distilbert"].extend(
         [
             "TF_DISTILBERT_PRETRAINED_MODEL_ARCHIVE_LIST",
@@ -2380,6 +2412,14 @@ else:
             "TFRemBertPreTrainedModel",
         ]
     )
+    _import_structure["models.resnet"].extend(
+        [
+            "TF_RESNET_PRETRAINED_MODEL_ARCHIVE_LIST",
+            "TFResNetForImageClassification",
+            "TFResNetModel",
+            "TFResNetPreTrainedModel",
+        ]
+    )
     _import_structure["models.roberta"].extend(
         [
             "TF_ROBERTA_PRETRAINED_MODEL_ARCHIVE_LIST",
@@ -2406,6 +2446,16 @@ else:
             "TFRoFormerLayer",
             "TFRoFormerModel",
             "TFRoFormerPreTrainedModel",
+        ]
+    )
+    _import_structure["models.segformer"].extend(
+        [
+            "TF_SEGFORMER_PRETRAINED_MODEL_ARCHIVE_LIST",
+            "TFSegformerDecodeHead",
+            "TFSegformerForImageClassification",
+            "TFSegformerForSemanticSegmentation",
+            "TFSegformerModel",
+            "TFSegformerPreTrainedModel",
         ]
     )
     _import_structure["models.speech_to_text"].extend(
@@ -2980,6 +3030,13 @@ if TYPE_CHECKING:
     from .models.nystromformer import NYSTROMFORMER_PRETRAINED_CONFIG_ARCHIVE_MAP, NystromformerConfig
     from .models.openai import OPENAI_GPT_PRETRAINED_CONFIG_ARCHIVE_MAP, OpenAIGPTConfig, OpenAIGPTTokenizer
     from .models.opt import OPTConfig
+    from .models.owlvit import (
+        OWLVIT_PRETRAINED_CONFIG_ARCHIVE_MAP,
+        OwlViTConfig,
+        OwlViTProcessor,
+        OwlViTTextConfig,
+        OwlViTVisionConfig,
+    )
     from .models.pegasus import PEGASUS_PRETRAINED_CONFIG_ARCHIVE_MAP, PegasusConfig, PegasusTokenizer
     from .models.perceiver import PERCEIVER_PRETRAINED_CONFIG_ARCHIVE_MAP, PerceiverConfig, PerceiverTokenizer
     from .models.phobert import PhobertTokenizer
@@ -3170,6 +3227,7 @@ if TYPE_CHECKING:
         from .models.mbart import MBart50Tokenizer, MBartTokenizer
         from .models.mluke import MLukeTokenizer
         from .models.mt5 import MT5Tokenizer
+        from .models.nllb import NllbTokenizer
         from .models.pegasus import PegasusTokenizer
         from .models.plbart import PLBartTokenizer
         from .models.reformer import ReformerTokenizer
@@ -3224,6 +3282,7 @@ if TYPE_CHECKING:
         from .models.mpnet import MPNetTokenizerFast
         from .models.mt5 import MT5TokenizerFast
         from .models.mvp import MvpTokenizerFast
+        from .models.nllb import NllbTokenizerFast
         from .models.openai import OpenAIGPTTokenizerFast
         from .models.pegasus import PegasusTokenizerFast
         from .models.realm import RealmTokenizerFast
@@ -3294,6 +3353,7 @@ if TYPE_CHECKING:
         from .models.levit import LevitFeatureExtractor
         from .models.maskformer import MaskFormerFeatureExtractor
         from .models.mobilevit import MobileViTFeatureExtractor
+        from .models.owlvit import OwlViTFeatureExtractor
         from .models.perceiver import PerceiverFeatureExtractor
         from .models.poolformer import PoolFormerFeatureExtractor
         from .models.segformer import SegformerFeatureExtractor
@@ -4003,7 +4063,21 @@ if TYPE_CHECKING:
             OpenAIGPTPreTrainedModel,
             load_tf_weights_in_openai_gpt,
         )
-        from .models.opt import OPT_PRETRAINED_MODEL_ARCHIVE_LIST, OPTForCausalLM, OPTModel, OPTPreTrainedModel
+        from .models.opt import (
+            OPT_PRETRAINED_MODEL_ARCHIVE_LIST,
+            OPTForCausalLM,
+            OPTForSequenceClassification,
+            OPTModel,
+            OPTPreTrainedModel,
+        )
+        from .models.owlvit import (
+            OWLVIT_PRETRAINED_MODEL_ARCHIVE_LIST,
+            OwlViTForObjectDetection,
+            OwlViTModel,
+            OwlViTPreTrainedModel,
+            OwlViTTextModel,
+            OwlViTVisionModel,
+        )
         from .models.pegasus import (
             PegasusForCausalLM,
             PegasusForConditionalGeneration,
@@ -4566,6 +4640,14 @@ if TYPE_CHECKING:
             TFDebertaV2Model,
             TFDebertaV2PreTrainedModel,
         )
+        from .models.deit import (
+            TF_DEIT_PRETRAINED_MODEL_ARCHIVE_LIST,
+            TFDeiTForImageClassification,
+            TFDeiTForImageClassificationWithTeacher,
+            TFDeiTForMaskedImageModeling,
+            TFDeiTModel,
+            TFDeiTPreTrainedModel,
+        )
         from .models.distilbert import (
             TF_DISTILBERT_PRETRAINED_MODEL_ARCHIVE_LIST,
             TFDistilBertForMaskedLM,
@@ -4721,6 +4803,12 @@ if TYPE_CHECKING:
             TFRemBertModel,
             TFRemBertPreTrainedModel,
         )
+        from .models.resnet import (
+            TF_RESNET_PRETRAINED_MODEL_ARCHIVE_LIST,
+            TFResNetForImageClassification,
+            TFResNetModel,
+            TFResNetPreTrainedModel,
+        )
         from .models.roberta import (
             TF_ROBERTA_PRETRAINED_MODEL_ARCHIVE_LIST,
             TFRobertaForCausalLM,
@@ -4744,6 +4832,14 @@ if TYPE_CHECKING:
             TFRoFormerLayer,
             TFRoFormerModel,
             TFRoFormerPreTrainedModel,
+        )
+        from .models.segformer import (
+            TF_SEGFORMER_PRETRAINED_MODEL_ARCHIVE_LIST,
+            TFSegformerDecodeHead,
+            TFSegformerForImageClassification,
+            TFSegformerForSemanticSegmentation,
+            TFSegformerModel,
+            TFSegformerPreTrainedModel,
         )
         from .models.speech_to_text import (
             TF_SPEECH_TO_TEXT_PRETRAINED_MODEL_ARCHIVE_LIST,
