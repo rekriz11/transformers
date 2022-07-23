@@ -1592,7 +1592,8 @@ class GenerationMixin:
         for beam_idx in range(scores.shape[0]):
             cur_tokens = input_ids[beam_idx][input_length:].tolist()
             print("cur_tokens: {}".format(cur_tokens))
-            if cur_tokens != [] and (cur_tokens[-1] == 2 or input_ids[beam_idx].tolist().count(eos_token_id) >= 1):
+            if cur_tokens != [] and (cur_tokens[-1] == 2 or cur_tokens.count(eos_token_id) >= 1):
+                print("Should be done generating!")
                 continue
             
             ## Check for answer start phrase, which will come when a slot question is finished
