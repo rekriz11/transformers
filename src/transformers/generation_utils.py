@@ -1660,7 +1660,7 @@ class GenerationMixin:
                 for prev in prev_answer:
                     for i in range(len(used_context)):
                         ## When a non-overlapping previous candidate is found, mark it as used context
-                        if context[i:i+len(prev)] == prev and \
+                        if context[i:i+len(prev)].tolist() == prev and \
                         used_context[i:i+len(prev)] == [0 for j in range(len(prev))]:
                             used_context[i:i+len(prev)] == [1 for j in range(len(prev))]
                             break
