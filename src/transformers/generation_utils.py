@@ -1572,8 +1572,7 @@ class GenerationMixin:
         forced_slot, cur_slots = [0 for i in range(scores.shape[0])], [[] for i in range(scores.shape[0])]
         forced_answer = [0 for i in range(scores.shape[0])]
         prev_answers, cur_answers = [[] for i in range(scores.shape[0])], [[] for i in range(scores.shape[0])]
-        print("\n\nMasking invalid tokens...")
-        import pdb; pdb.set_trace()
+        print("\n\nMasking invalid tokens...\n")
         for beam_idx in range(scores.shape[0]):
             cur_tokens = input_ids[beam_idx][input_length:].tolist()
             print(cur_tokens)
