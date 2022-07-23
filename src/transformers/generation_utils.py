@@ -1593,7 +1593,7 @@ class GenerationMixin:
 
             ## If answer start phrase is not found at all, mark this as needing to finish the first slot question
             if answer_start_idx == -1:
-                print("Answer start phrase {} not found in candidate {}".format(answer_start_phrase, cur_tokens))
+                print("Answer start delimiter {} not found in candidate {}".format(answer_start_delim, cur_tokens))
                 forced_slot[beam_idx] = 1
                 cur_slots[beam_idx] = cur_tokens
                 continue
