@@ -1567,11 +1567,12 @@ class GenerationMixin:
         return prev_inputs, cur_inputs
 
     ## Added constrained generation helper to only allow generation of valid candidates after delimiter
-    def set_scores_to_inf_for_invalid_candidates(self, scores, input_ids, forced_constraints, context, empty_answer, delimiters, eos_token_id, input_length):
+    def set_scores_to_inf_for_invalid_candidates(self, scores, input_ids, slot_constraints, context, empty_answer, delimiters, eos_token_id, input_length):
         [answer_start_delim, answer_delim, slot_delim] = delimiters
         forced_slot, cur_slots = [0 for i in range(scores.shape[0])], [[] for i in range(scores.shape[0])]
         forced_answer = [0 for i in range(scores.shape[0])]
         prev_answers, cur_answers = [[] for i in range(scores.shape[0])], [[] for i in range(scores.shape[0])]
+        print("\n\nMasking invalid tokens...")
         import pdb; pdb.set_trace()
         for beam_idx in range(scores.shape[0]):
             cur_tokens = input_ids[beam_idx][input_length:].tolist()
@@ -1656,40 +1657,52 @@ class GenerationMixin:
                     ## Otherwise, the current answer has been started
                     valid_mask_list = []
                     ## Iterate through input text to find all instances of the answer that has been generated so far,
-                    ## the next subword following each instance is a valid next step,
-                    ## unless it's been used by a previous candidate
-                    if forced_slot[beam_idx] < len(forced_constraints):
+                    for idx in range(len(context) - len(cur_answer)):
+                        if context[idx:idx+len(cur_answer)] == cur_answer and \
+                        used_context[idx:idx+len(cur_answer)] == [0 for j in range(len(cur_answer))]:
+                            ## The next subword following each instance is a valid next step, 
+                            ## unless it's been used by a previous candidate
+                            valid_mask_list.append([beam_idx, context[idx+len(cur_answer)]])
+                    if forced_slot[beam_idx] < len(slot_constraints):
                         ## If we haven't generated all forced candidates, allow the major delimiter
                         valid_mask_list.append([beam_idx, slot_delim])
                     else:
                         ## If we've generated all forced candidates, allow EOS
                         valid_mask_list.append([beam_idx, eos_token_id])
-
-
-
-
-
-
-
-                    ## If no partial answer has been generated yet, all input subwords are valid
-                if not cur_inp:
-                    valid_mask_list = [[beam_idx, v2] for v2 in list(set(input[0].tolist()))]
+                print("FORCED CONTEXT for idx {}, cur_answer: {}\nvalid_mask_list: {}".format(beam_idx, cur_answer, valid_mask_list))
+            elif forced_slot[beam_idx]:
+                ## Subtract one from index to start at 0
+                constraint = slot_constraints[forced_slots[beam_idx]-1]
+                if not cur_slot:
+                    ## If slot constraint has not been started, only allow the first token
+                    valid_mask_list = [[beam_idx, constraint[0]]]
                 else:
-                    ## If something has been generated, the major delimiter and EOS are always valid next steps
-                    valid_mask_list = [[beam_idx, delimiters[0][0].item()], [beam_idx, 2]]
-                    ## Iterate through input text to find all instances of the answer that has been generated so far,
-                    ## the next subword following each instance is a valid next step
-                    for idx in range(len(input[0])-len(cur_inp)):
-                        if input[0][idx:idx+len(cur_inp)].tolist() == cur_inp:
-                            valid_mask_list.append([beam_idx, input[0][idx+len(cur_inp)].item()])
-                #print("FORCED INPUT for idx {}, cur_inp: {}, valid_mask_list: {}".format(beam_idx, cur_inp, valid_mask_list))
-
-
-
-
-
-
-                
+                    ## Check if slot constraint has been correctly generated so far
+                    if constraint[:len(cur_slot)] != cur_slot:
+                        valid_mask_list = []
+                        print("ERROR generating slot constraint!!")
+                        import pdb; pdb.set_trace()
+                    if len(constraint) > len(cur_slot):
+                        ## If slot constraint is unfinished, only allow model to generate next step
+                        valid_mask_list = [[beam_idx, constraint[len(cur_slot)]]]
+                    elif len(constraint) == len(cur_slot):
+                        ## If slot candidate is finished, allow model to generate any input subword (and unknown answer)
+                        ## NOTE: THIS SHOULD NOT BE GETTING TO, THROW AN ERROR
+                        print("ERROR, should be forcing from input!")
+                        import pdb; pdb.set_trace()
+                        #valid_mask_list = [[beam_idx, v] for v in context]
+                        #valid_mask_list.append([beam_idx, empty_answer])
+                    else:
+                        print("ERROR, check what went wrong!")
+                        import pdb; pdb.set_trace()
+                print("{} FORCED SLOT, for idx {}, cur_slot: {}, valid_mask_list: {}".format(beam_idx, cur_slot, valid_mask_list))
+            else:
+                print("ERROR Should be done? Debug")
+                import pdb; pdb.set_trace()
+        scores = self.mask_vocab(scores, beam_idx, valid_mask_list)
+        print("SCORES: \n{}".format([scores[v[0]][v[1]] for v in valid_mask_list]))
+        import pdb; pdb.set_trace()
+        return scores
 
 
 
