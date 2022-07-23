@@ -1588,7 +1588,7 @@ class GenerationMixin:
         forced_slot, cur_slots = [0 for i in range(scores.shape[0])], [[] for i in range(scores.shape[0])]
         forced_answer = [0 for i in range(scores.shape[0])]
         prev_answers, cur_answers = [[] for i in range(scores.shape[0])], [[] for i in range(scores.shape[0])]
-        print("\nMasking invalid tokens...")
+        print("Masking invalid tokens...")
         for beam_idx in range(scores.shape[0]):
             cur_tokens = input_ids[beam_idx][input_length:].tolist()
             print("cur_tokens: {}".format(cur_tokens))
@@ -2107,9 +2107,11 @@ class GenerationMixin:
         unfinished_sequences = input_ids.new(input_ids.shape[0]).fill_(1)
         cur_len = input_ids.shape[-1]
         input_length = input_ids.shape[-1]
+        step = 0
 
         this_peer_finished = False  # used by synced_gpus only
         while True:
+            step += 1
 
             if synced_gpus:
                 # Under synced_gpus the `forward` call must continue until all gpus complete their sequence.
@@ -2142,6 +2144,7 @@ class GenerationMixin:
             next_tokens_scores = logits_processor(input_ids, next_token_logits)
             ## Added function for constrained decoding
             if slot_constraints is not None:
+                print("\n#####STEP {}####".format(step))
                 next_tokens_scores = self.set_scores_to_inf_for_invalid_candidates(next_tokens_scores, input_ids, \
                     slot_constraints, valid_input, empty_answer, delimiters, eos_token_id, input_length)
             
