@@ -1566,6 +1566,22 @@ class GenerationMixin:
             cur_inputs[beam_idx] = cur_answers
         return prev_inputs, cur_inputs
 
+    ## Added constrained generation helper to mask all but a valid list of subwords
+    def mask_vocab(self, scores, beam_idx, valid_mask_list):
+        ## If there are no valid candidates, throw an error
+        if valid_mask_list == []:
+            scores[beam_idx] = -float("inf")
+            print("No valid candidates!")
+            import pdb; pdb.set_trace()
+        else:
+            valid_mask = torch.LongTensor(valid_mask_list)
+            indices = torch.ones(len(valid_mask))
+            ## Avoids masking all valid tokens, masks all others
+            valid_mask = ~(torch.sparse.LongTensor(valid_mask.t(), \
+                indices, scores.size()).to(scores.device).to_dense().bool())
+            scores[beam_idx] = scores[beam_idx].masked_fill(valid_mask[beam_idx], -float("inf"))
+        return scores
+
     ## Added constrained generation helper to only allow generation of valid candidates after delimiter
     def set_scores_to_inf_for_invalid_candidates(self, scores, input_ids, slot_constraints, context, empty_answer, delimiters, eos_token_id, input_length):
         [answer_start_delim, answer_delim, slot_delim] = delimiters
