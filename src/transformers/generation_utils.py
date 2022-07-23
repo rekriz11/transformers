@@ -1658,12 +1658,17 @@ class GenerationMixin:
                 ## Finds all previous candidates in the context
                 used_context = [0 for i in range(len(context))]
                 for prev in prev_answer:
+                    found = False
                     for i in range(len(used_context)):
                         ## When a non-overlapping previous candidate is found, mark it as used context
                         if context[i:i+len(prev)].tolist() == prev and \
                         used_context[i:i+len(prev)] == [0 for j in range(len(prev))]:
                             used_context[i:i+len(prev)] == [1 for j in range(len(prev))]
+                            found = True
                             break
+                    if not found:
+                        print("Previous answer not found!!")
+                        import pdb; pdb.set_trace()
 
                 if not cur_answer:
                     ## If no current answer has been started yet, allow all unused context
