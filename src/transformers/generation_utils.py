@@ -1664,10 +1664,18 @@ class GenerationMixin:
                 if not cur_answer:
                     ## If no current answer has been started yet, allow all unused context
                     cur_valid_candidates = [context[i] for i in range(len(context)) if used_context[i] == 0]
-                    ## Add empty answer if no previous answers
                     if not prev_answer:
+                        ## Allow empty answer if no previous answers
                         cur_valid_candidates.append(empty_answer)
                     valid_mask_list = [[beam_idx, v] for v in list(set(cur_valid_candidates))]
+                    if prev_answer:
+                        ## If there are previous answers for this slot, the model doesn't have to generate any more
+                        if forced_slot[beam_idx] < len(slot_constraints):
+                            ## If we haven't generated all forced candidates, allow the slot delimiter
+                            valid_mask_list.append([beam_idx, slot_delim])
+                        else:
+                            ## If we've generated all forced candidates, allow EOS
+                            valid_mask_list.append([beam_idx, eos_token_id])
                 else:
                     ## Otherwise, the current answer has been started
                     valid_mask_list = []
@@ -1680,12 +1688,8 @@ class GenerationMixin:
                             ## The next subword following each instance is a valid next step, 
                             ## unless it's been used by a previous candidate
                             valid_mask_list.append([beam_idx, context[idx+len(cur_answer)]])
-                    if forced_slot[beam_idx] < len(slot_constraints):
-                        ## If we haven't generated all forced candidates, allow the major delimiter
-                        valid_mask_list.append([beam_idx, slot_delim])
-                    else:
-                        ## If we've generated all forced candidates, allow EOS
-                        valid_mask_list.append([beam_idx, eos_token_id])
+                    ## Always allow the answer delimiter
+                    valid_mask_list.append([beam_idx, answer_delim])
                 print("FORCED CONTEXT for idx {}, cur_answer: {}\nvalid_mask_list: {}".format(beam_idx, cur_answer, valid_mask_list))
                 import pdb; pdb.set_trace()
             elif forced_slot[beam_idx]:
