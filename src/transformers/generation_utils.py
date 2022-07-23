@@ -53,6 +53,7 @@ from .generation_stopping_criteria import (
 )
 from .pytorch_utils import torch_int_div
 from .utils import ModelOutput, logging
+from itertools import groupby
 
 
 logger = logging.get_logger(__name__)
@@ -1575,7 +1576,7 @@ class GenerationMixin:
             import pdb; pdb.set_trace()
         else:
             valid_mask = torch.LongTensor(valid_mask_list)
-            print("valid_mask_list: {}".format(valid_mask))
+            print("valid_mask: {}".format(valid_mask))
             indices = torch.ones(len(valid_mask))
             ## Avoids masking all valid tokens, masks all others
             valid_mask = ~(torch.sparse.LongTensor(valid_mask.t(), \
