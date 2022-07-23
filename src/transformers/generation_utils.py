@@ -1575,6 +1575,7 @@ class GenerationMixin:
             import pdb; pdb.set_trace()
         else:
             valid_mask = torch.LongTensor(valid_mask_list)
+            print("valid_mask_list: {}".format(valid_mask))
             indices = torch.ones(len(valid_mask))
             ## Avoids masking all valid tokens, masks all others
             valid_mask = ~(torch.sparse.LongTensor(valid_mask.t(), \
