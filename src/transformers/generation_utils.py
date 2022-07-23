@@ -1685,6 +1685,7 @@ class GenerationMixin:
                         ## If we've generated all forced candidates, allow EOS
                         valid_mask_list.append([beam_idx, eos_token_id])
                 print("FORCED CONTEXT for idx {}, cur_answer: {}\nvalid_mask_list: {}".format(beam_idx, cur_answer, valid_mask_list))
+                import pdb; pdb.set_trace()
             elif forced_slot[beam_idx]:
                 ## Subtract one from index to start at 0
                 constraint = slot_constraints[forced_slot[beam_idx]-1]
