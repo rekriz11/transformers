@@ -1562,14 +1562,13 @@ class GenerationMixin:
             answer_delim_idx = len(all_answers) - all_answers.index(answer_delim)
             all_answers.reverse()
             ## If answer delimiter is found, save the previous answer(s)
-            prev_answers[beam_idx], cur_answers = self.split_list(all_answers[:answer_delim_idx], answer_delim)
-            cur_answer[beam_idx] = all_answers[answer_delim_idx:]
+            prev_answers[beam_idx], cur_answers[beam_idx] = self.split_list(all_answers[:answer_delim_idx], answer_delim)
         except ValueError:
             ## If answer delimiter not found, there are no previous answers 
             ## and need to finish generating the first answer
-            cur_answers.reverse()
-            cur_inputs[beam_idx] = cur_answers
-        return prev_inputs, cur_inputs
+            all_answers.reverse()
+            cur_answers[beam_idx] = all_answers
+        return prev_answers, cur_answers
 
     ## Added constrained generation helper to mask all but a valid list of subwords
     def mask_vocab(self, scores, beam_idx, valid_mask_list):
