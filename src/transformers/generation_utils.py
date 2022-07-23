@@ -1557,16 +1557,13 @@ class GenerationMixin:
     def split_slot_answers(self, cur_tokens, answer_start_idx, answer_delim, prev_answers, cur_answers, beam_idx):
         all_answers = cur_tokens[answer_start_idx:]
         try:
-            ## Reversing again, to find the last answer delimiter
-            all_answers.reverse()
-            answer_delim_idx = len(all_answers) - all_answers.index(answer_delim)
-            all_answers.reverse()
+            ## Determine if there's a finished answer found
+            answer_delim_idx = all_answers.index(answer_delim)
             ## If answer delimiter is found, save the previous answer(s)
             prev_answers[beam_idx], cur_answers[beam_idx] = self.split_list(all_answers, answer_delim)
         except ValueError:
             ## If answer delimiter not found, there are no previous answers 
             ## and need to finish generating the first answer
-            all_answers.reverse()
             cur_answers[beam_idx] = all_answers
         return prev_answers, cur_answers
 
