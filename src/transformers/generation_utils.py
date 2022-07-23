@@ -1548,6 +1548,7 @@ class GenerationMixin:
     def split_list(self, listy, delimiter):
         split = [list(group) for k, group in groupby(listy, lambda x: x == delimiter) if not k][1:]
         print("listy: {}, delimiter: {}, split: {}".format(listy, delimiter, split))
+        import pdb; pdb.set_trace()
         return split
 
     def split_slot_answers(self, cur_tokens, answer_start_idx, answer_delim, prev_inputs, cur_inputs, beam_idx):
