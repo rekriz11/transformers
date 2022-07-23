@@ -1627,7 +1627,7 @@ class GenerationMixin:
                 print("Slot delimiter {} not found in candidate {}".format(slot_delim, cur_tokens))
                 forced_answer[beam_idx] = 1
                 ## Split up previous slot answers and curent answers
-                prev_answers, cur_answers = split_slot_answers(self, cur_tokens, answers_start_idx, \
+                prev_answers, cur_answers = self.split_slot_answers(cur_tokens, answers_start_idx, \
                     answer_delim, prev_answers, cur_answers, beam_idx)
                 continue
 
@@ -1640,7 +1640,7 @@ class GenerationMixin:
             ## force generation of answers for the current slot
             if answer_start_idx > slot_delim_idx:
                 forced_answer[beam_idx] = 1
-                prev_inputs, cur_inputs = split_slot_answers(self, cur_tokens, answers_start_idx, \
+                prev_inputs, cur_inputs = self.split_slot_answers(cur_tokens, answers_start_idx, \
                     answer_delim, prev_answers, cur_answers, beam_idx)
 
         print("\ndelimiters: {}\n\nforced_slot: {}\ncur_slots: {}\n\nforced_answer: {}\nprev_answers: {}\ncur_answers: {}".format(delimiters, \
