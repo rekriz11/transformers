@@ -1549,8 +1549,8 @@ class GenerationMixin:
         print(groupby(listy, lambda x: x == delimiter))
         print([k for k, group in groupby(listy, lambda x: x == delimiter)])
         print([list(group) for k, group in groupby(listy, lambda x: x == delimiter)])
-        print([list(group) for k, group in groupby(listy, lambda x: x == delimiter) if not k])
-        split = [list(group) for k, group in groupby(listy, lambda x: x == delimiter) if not k][1:]
+        split = [list(group) for k, group in groupby(listy, lambda x: x == delimiter)]
+        split = [[c for c in answer if c != delimiter] for answer in split]
         print("listy: {}, delimiter: {}, split: {}".format(listy, delimiter, split))
         import pdb; pdb.set_trace()
         return split
