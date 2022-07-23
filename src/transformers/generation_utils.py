@@ -1575,7 +1575,7 @@ class GenerationMixin:
         print("\n\nMasking invalid tokens...\n")
         for beam_idx in range(scores.shape[0]):
             cur_tokens = input_ids[beam_idx][input_length:].tolist()
-            print(cur_tokens)
+            print("cur_tokens: {}".format(cur_tokens))
             if cur_tokens != [] and (cur_tokens[-1] == 2 or tokens[beam_idx].tolist().count(eos_token_id) >= 1):
                 continue
             
@@ -1626,8 +1626,8 @@ class GenerationMixin:
                 prev_inputs, cur_inputs = split_slot_answers(self, cur_tokens, answers_start_idx, \
                     answer_delim, prev_answers, cur_answers, beam_idx)
 
-        print("\ndelimiters: {}\n\nforced_slots: {}\ncur_slots: {}\n\nforced_answer: {}\nprev_answers: {}\ncur_answers: {}".format(delimiters, \
-            forced_slots, cur_slots, forced_answer, prev_answers, cur_answers))
+        print("\ndelimiters: {}\n\nforced_slot: {}\ncur_slots: {}\n\nforced_answer: {}\nprev_answers: {}\ncur_answers: {}".format(delimiters, \
+            forced_slot, cur_slots, forced_answer, prev_answers, cur_answers))
 
         for beam_idx, (cur_slot, cur_answer, prev_answer) in enumerate(zip(cur_slots, cur_answers, prev_answers)):
             if len(input_ids) > 1 and input_ids[beam_idx].tolist().count(eos_token_id) >= 2:
