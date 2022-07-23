@@ -1572,7 +1572,7 @@ class GenerationMixin:
         forced_slot, cur_slots = [0 for i in range(scores.shape[0])], [[] for i in range(scores.shape[0])]
         forced_answer = [0 for i in range(scores.shape[0])]
         prev_answers, cur_answers = [[] for i in range(scores.shape[0])], [[] for i in range(scores.shape[0])]
-        print("\n\nMasking invalid tokens...\n")
+        print("\nMasking invalid tokens...")
         for beam_idx in range(scores.shape[0]):
             cur_tokens = input_ids[beam_idx][input_length:].tolist()
             print("cur_tokens: {}".format(cur_tokens))
@@ -1671,7 +1671,7 @@ class GenerationMixin:
                 print("FORCED CONTEXT for idx {}, cur_answer: {}\nvalid_mask_list: {}".format(beam_idx, cur_answer, valid_mask_list))
             elif forced_slot[beam_idx]:
                 ## Subtract one from index to start at 0
-                constraint = slot_constraints[forced_slots[beam_idx]-1]
+                constraint = slot_constraints[forced_slot[beam_idx]-1]
                 if not cur_slot:
                     ## If slot constraint has not been started, only allow the first token
                     valid_mask_list = [[beam_idx, constraint[0]]]
