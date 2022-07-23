@@ -1562,7 +1562,7 @@ class GenerationMixin:
             answer_delim_idx = len(all_answers) - all_answers.index(answer_delim)
             all_answers.reverse()
             ## If answer delimiter is found, save the previous answer(s)
-            prev_answers[beam_idx], cur_answers[beam_idx] = self.split_list(all_answers[:answer_delim_idx], answer_delim)
+            prev_answers[beam_idx], cur_answers[beam_idx] = self.split_list(all_answers, answer_delim)
         except ValueError:
             ## If answer delimiter not found, there are no previous answers 
             ## and need to finish generating the first answer
