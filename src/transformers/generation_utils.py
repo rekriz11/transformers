@@ -1663,7 +1663,7 @@ class GenerationMixin:
                         ## When a non-overlapping previous candidate is found, mark it as used context
                         if context[i:i+len(prev)].tolist() == prev and \
                         used_context[i:i+len(prev)] == [0 for j in range(len(prev))]:
-                            used_context[i:i+len(prev)] == [1 for j in range(len(prev))]
+                            used_context[i:i+len(prev)] = [1 for j in range(len(prev))]
                             print("Found!, used context updated: {}".format(used_context))
                             found = True
                             break
