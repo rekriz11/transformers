@@ -1673,6 +1673,8 @@ class GenerationMixin:
                     valid_mask_list = []
                     ## Iterate through input text to find all instances of the answer that has been generated so far,
                     for idx in range(len(context) - len(cur_answer)):
+                        print("\nSTART_IDX: {}, CUR_ANSWER: {}, CONTEXT: {}, USED_CONTEXT: {}".format(idx, \
+                            cur_answer, context[idx:idx+len(cur_answer)], used_context[idx:idx+len(cur_answer)]))
                         if context[idx:idx+len(cur_answer)] == cur_answer and \
                         used_context[idx:idx+len(cur_answer)] == [0 for j in range(len(cur_answer))]:
                             ## The next subword following each instance is a valid next step, 
