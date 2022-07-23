@@ -1694,7 +1694,7 @@ class GenerationMixin:
                     else:
                         print("ERROR, check what went wrong!")
                         import pdb; pdb.set_trace()
-                print("{} FORCED SLOT, for idx {}, cur_slot: {}, valid_mask_list: {}".format(beam_idx, cur_slot, valid_mask_list))
+                print("FORCED SLOT, for idx {}, cur_slot: {}, valid_mask_list: {}".format(beam_idx, cur_slot, valid_mask_list))
             else:
                 print("ERROR Should be done? Debug")
                 import pdb; pdb.set_trace()
