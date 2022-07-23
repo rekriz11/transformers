@@ -1549,7 +1549,7 @@ class GenerationMixin:
         print("listy: {}, delimiter: {}, split: {}".format(listy, delimiter, split))
         return split
 
-    def split_slot_answers(self, cur_tokens, answers_start_idx, answer_delim, prev_inputs, cur_inputs, beam_idx):
+    def split_slot_answers(self, cur_tokens, answer_start_idx, answer_delim, prev_inputs, cur_inputs, beam_idx):
         cur_answers = cur_tokens[answer_start_idx:]
         try:
             ## Reversing again, to find the last answer delimiter
@@ -1588,7 +1588,6 @@ class GenerationMixin:
         forced_slot, cur_slots = [0 for i in range(scores.shape[0])], [[] for i in range(scores.shape[0])]
         forced_answer = [0 for i in range(scores.shape[0])]
         prev_answers, cur_answers = [[] for i in range(scores.shape[0])], [[] for i in range(scores.shape[0])]
-        print("Masking invalid tokens...")
         for beam_idx in range(scores.shape[0]):
             cur_tokens = input_ids[beam_idx][input_length:].tolist()
             print("cur_tokens: {}".format(cur_tokens))
@@ -1627,7 +1626,7 @@ class GenerationMixin:
                 print("Slot delimiter {} not found in candidate {}".format(slot_delim, cur_tokens))
                 forced_answer[beam_idx] = 1
                 ## Split up previous slot answers and curent answers
-                prev_answers, cur_answers = self.split_slot_answers(cur_tokens, answers_start_idx, \
+                prev_answers, cur_answers = self.split_slot_answers(cur_tokens, answer_start_idx, \
                     answer_delim, prev_answers, cur_answers, beam_idx)
                 continue
 
@@ -1640,7 +1639,7 @@ class GenerationMixin:
             ## force generation of answers for the current slot
             if answer_start_idx > slot_delim_idx:
                 forced_answer[beam_idx] = 1
-                prev_inputs, cur_inputs = self.split_slot_answers(cur_tokens, answers_start_idx, \
+                prev_inputs, cur_inputs = self.split_slot_answers(cur_tokens, answer_start_idx, \
                     answer_delim, prev_answers, cur_answers, beam_idx)
 
         print("\ndelimiters: {}\n\nforced_slot: {}\ncur_slots: {}\n\nforced_answer: {}\nprev_answers: {}\ncur_answers: {}".format(delimiters, \
@@ -1717,7 +1716,6 @@ class GenerationMixin:
                 import pdb; pdb.set_trace()
         scores = self.mask_vocab(scores, beam_idx, valid_mask_list)
         print("\nSCORES: {}".format([scores[v[0]][v[1]] for v in valid_mask_list]))
-        import pdb; pdb.set_trace()
         return scores
 
 
