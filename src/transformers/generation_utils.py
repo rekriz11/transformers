@@ -1546,25 +1546,24 @@ class GenerationMixin:
 
     ## Splits list by a delimiter
     def split_list(self, listy, delimiter):
-        print(groupby(listy, lambda x: x == delimiter))
-        print([k for k, group in groupby(listy, lambda x: x == delimiter)])
-        print([list(group) for k, group in groupby(listy, lambda x: x == delimiter)])
         split = [list(group) for k, group in groupby(listy, lambda x: x == delimiter)]
         split = [[c for c in answer if c != delimiter] for answer in split]
-        print("listy: {}, delimiter: {}, split: {}".format(listy, delimiter, split))
+        prev_answers, cur_answer = split[:-1], split[-1]
+        print("listy: {}, delimiter: {}, prev_answers: {}, cur_answer: {}".format(listy, \
+            delimiter, prev_answers, cur_answer))
         import pdb; pdb.set_trace()
-        return split
+        return prev_answers, cur_answer
 
-    def split_slot_answers(self, cur_tokens, answer_start_idx, answer_delim, prev_inputs, cur_inputs, beam_idx):
-        cur_answers = cur_tokens[answer_start_idx:]
+    def split_slot_answers(self, cur_tokens, answer_start_idx, answer_delim, prev_answers, cur_answers, beam_idx):
+        all_answers = cur_tokens[answer_start_idx:]
         try:
             ## Reversing again, to find the last answer delimiter
-            cur_answers.reverse()
-            answer_delim_idx = len(cur_answers) - cur_answers.index(answer_delim)
-            cur_answers.reverse()
+            all_answers.reverse()
+            answer_delim_idx = len(all_answers) - all_answers.index(answer_delim)
+            all_answers.reverse()
             ## If answer delimiter is found, save the previous answer(s)
-            prev_inputs[beam_idx] = self.split_list(cur_answers[:answer_delim_idx], answer_delim)
-            cur_inputs[beam_idx] = cur_answers[answer_delim_idx:]
+            prev_answers[beam_idx], cur_answers = self.split_list(all_answers[:answer_delim_idx], answer_delim)
+            cur_answer[beam_idx] = all_answers[answer_delim_idx:]
         except ValueError:
             ## If answer delimiter not found, there are no previous answers 
             ## and need to finish generating the first answer
