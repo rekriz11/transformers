@@ -1610,8 +1610,7 @@ class GenerationMixin:
                 print("Slot delimiter {} not found in candidate {}".format(slot_delim, cur_tokens))
                 forced_answer[beam_idx] = 1
                 ## Split up previous slot answers and curent answers
-                prev_answers, cur_answers = split_slot_answers(self, cur_tokens, answers_start_idx, \
-                    answer_delim, prev_answers, cur_answers beam_idx)
+                prev_answers, cur_answers = split_slot_answers(self, cur_tokens, answers_start_idx, answer_delim, prev_answers, cur_answers beam_idx)
                 continue
 
             ## At this point, we know that a slot delimiter has been generated
