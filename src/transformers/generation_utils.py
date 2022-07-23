@@ -1694,7 +1694,7 @@ class GenerationMixin:
                     valid_mask_list = [[beam_idx, constraint[0]]]
                 else:
                     ## Check if slot constraint has been correctly generated so far
-                    if constraint[:len(cur_slot)] != cur_slot:
+                    if constraint[:len(cur_slot)].tolist() != cur_slot:
                         valid_mask_list = []
                         print("ERROR generating slot constraint!!")
                         import pdb; pdb.set_trace()
