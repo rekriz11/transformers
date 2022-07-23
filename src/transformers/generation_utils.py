@@ -1551,6 +1551,7 @@ class GenerationMixin:
         prev_answers, cur_answer = split[:-1], split[-1]
         print("listy: {}, delimiter: {}, prev_answers: {}, cur_answer: {}".format(listy, \
             delimiter, prev_answers, cur_answer))
+        import pdb; pdb.set_trace()
         return prev_answers, cur_answer
 
     def split_slot_answers(self, cur_tokens, answer_start_idx, answer_delim, prev_answers, cur_answers, beam_idx):
@@ -1578,7 +1579,6 @@ class GenerationMixin:
             import pdb; pdb.set_trace()
         else:
             valid_mask = torch.LongTensor(valid_mask_list)
-            print("valid_mask: {}".format(valid_mask))
             indices = torch.ones(len(valid_mask))
             ## Avoids masking all valid tokens, masks all others
             valid_mask = ~(torch.sparse.LongTensor(valid_mask.t(), \
@@ -1664,7 +1664,7 @@ class GenerationMixin:
                         if context[i:i+len(prev)].tolist() == prev and \
                         used_context[i:i+len(prev)] == [0 for j in range(len(prev))]:
                             used_context[i:i+len(prev)] = [1 for j in range(len(prev))]
-                            print("Found!, used context updated: {}".format(used_context))
+                            #print("Found!, used context updated: {}".format(used_context))
                             found = True
                             break
                     if not found:
