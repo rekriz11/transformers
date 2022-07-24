@@ -1544,7 +1544,7 @@ class GenerationMixin:
 
     ## Splits list by a delimiter
     def split_list(self, listy, delimiter):
-        split = [list(group) for k, group in groupby(listy, lambda x: x == delimiter if not k)]
+        split = [list(group) for k, group in groupby(listy, lambda x: x == delimiter)]
         split = [[c for c in answer if c != delimiter] for answer in split]
         prev_answers, cur_answer = split[:-1], split[-1]
         print("listy: {}, delimiter: {}, prev_answers: {}, cur_answer: {}".format(listy, \
