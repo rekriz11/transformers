@@ -1573,7 +1573,7 @@ class GenerationMixin:
             prev_cands = all_answers[answer_delim_idx:]
             prev_cands.reverse()
             prev_answers[beam_idx] = self.split_list(prev_cands, answer_delim)
-            import pdb; pdb.set_trace()
+            #import pdb; pdb.set_trace()
         except ValueError:
             ## If answer delimiter not found, there are no previous answers 
             ## and need to finish generating the first answer
@@ -1711,7 +1711,7 @@ class GenerationMixin:
                     ## Always allow the answer delimiter
                     valid_mask_list.append([beam_idx, answer_delim])
                 print("FORCED CONTEXT for idx {}, cur_answer: {}\nvalid_mask_list: {}".format(beam_idx, cur_answer, valid_mask_list))
-                import pdb; pdb.set_trace()
+                #import pdb; pdb.set_trace()
             elif forced_slot[beam_idx]:
                 ## Subtract one from index to start at 0
                 constraint = slot_constraints[forced_slot[beam_idx]-1]
