@@ -1597,7 +1597,7 @@ class GenerationMixin:
         return scores
 
     ## Added constrained generation helper to only allow generation of valid candidates after delimiter
-    def set_scores_to_inf_for_invalid_candidates(self, scores, input_ids, slot_constraints, context, empty_answer, delimiters, eos_token_id, input_length):
+    def set_scores_to_inf_for_invalid_candidates(self, scores, input_ids, slot_constraints, context, empty_answer, delimiters, eos_token_id, input_length, tokenizer):
         [answer_start_delim, answer_delim, slot_delim] = delimiters
         forced_slot, cur_slots = [0 for i in range(scores.shape[0])], [[] for i in range(scores.shape[0])]
         forced_answer = [0 for i in range(scores.shape[0])]
@@ -2172,7 +2172,7 @@ class GenerationMixin:
             if slot_constraints is not None:
                 print("\n#####STEP {}####".format(step))
                 next_tokens_scores = self.set_scores_to_inf_for_invalid_candidates(next_tokens_scores, input_ids, \
-                    slot_constraints, valid_input, empty_answer, delimiters, eos_token_id, input_length)
+                    slot_constraints, valid_input, empty_answer, delimiters, eos_token_id, input_length, tokenizer)
             
             # Store scores, attentions and hidden_states when required
             if return_dict_in_generate:
