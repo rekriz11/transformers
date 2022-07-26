@@ -1554,7 +1554,7 @@ class GenerationMixin:
         return prev_answers, cur_answer
     '''
     def split_list(self, listy, delimiter):
-        split = [list(group) for k, group in groupby(listy, lambda x: x == delimiter) if not k][1:]
+        split = [list(group) for k, group in groupby(listy, lambda x: x == delimiter) if not k]
         print("listy: {}, delimiter: {}, split: {}".format(listy, delimiter, split))
         return split
 
@@ -1575,8 +1575,6 @@ class GenerationMixin:
             prev_cands.reverse()
             prev_answers[beam_idx] = self.split_list(prev_cands, answer_delim)
             import pdb; pdb.set_trace()
-            ## If answer delimiter is found, save the previous answer(s)
-            prev_answers[beam_idx], cur_answers[beam_idx] = self.split_list(all_answers, answer_delim)
         except ValueError:
             ## If answer delimiter not found, there are no previous answers 
             ## and need to finish generating the first answer
