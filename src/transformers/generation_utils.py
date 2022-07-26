@@ -1636,7 +1636,6 @@ class GenerationMixin:
                 cur_tokens.reverse()
             except ValueError:
                 ## If slot delimiter not found, need to finish forced generation of answers for the first slot
-                cur_tokens.reverse()
                 print("Slot delimiter {} not found in candidate {}".format(slot_delim, cur_tokens))
                 forced_answer[beam_idx] = 1
                 ## Split up previous slot answers and curent answers
