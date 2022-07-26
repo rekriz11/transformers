@@ -1749,7 +1749,12 @@ class GenerationMixin:
             else:
                 print("ERROR Should be done? Debug")
                 import pdb; pdb.set_trace()
+        real_next_tokens = torch.argmax(next_tokens_scores, dim=-1)
+        print("Real next token: {}".format(constrained_next_tokens))
         scores = self.mask_vocab(scores, beam_idx, valid_mask_list)
+        constrained_next_tokens = torch.argmax(next_tokens_scores, dim=-1)
+        print("Constrained next token: {}".format(constrained_next_tokens))
+        import pdb; pdb.set_trace()
         #print("\nSCORES: {}".format([scores[v[0]][v[1]] for v in valid_mask_list]))
         return scores
 
@@ -1929,7 +1934,7 @@ class GenerationMixin:
             next_tokens_scores = logits_processor(input_ids, next_token_logits)
             ## Added function for constrained decoding
             if slot_constraints is not None:
-                #print("\n#####STEP {}####".format(step))
+                print("\n#####STEP {}####".format(step))
                 next_tokens_scores = self.set_scores_to_inf_for_invalid_candidates(next_tokens_scores, input_ids, \
                     slot_constraints, valid_input, empty_answer, delimiters, eos_token_id, input_length, tokenizer)
             
