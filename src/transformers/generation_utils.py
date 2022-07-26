@@ -1577,6 +1577,8 @@ class GenerationMixin:
         except ValueError:
             ## If answer delimiter not found, there are no previous answers 
             ## and need to finish generating the first answer
+            ## NEED TO REVERSE IT BACK FIRST!
+            all_answers.reverse()
             cur_answers[beam_idx] = all_answers
         return prev_answers, cur_answers
 
