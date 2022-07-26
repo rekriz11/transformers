@@ -1667,23 +1667,27 @@ class GenerationMixin:
             if forced_answer[beam_idx]:
                 ## Finds all previous candidates in the context
                 used_context = [0 for i in range(len(context))]
-                ## Sort previous answers from longest to smallest, hopefully this will get around weird overlapping issues
-                prev_answer = sorted(prev_answer, key=len, reverse=True)
-                for idx, prev in enumerate(prev_answer):
-                    found = False
-                    for i in range(len(used_context)):
-                        ## When a non-overlapping previous candidate is found, mark it as used context
-                        if context[i:i+len(prev)].tolist() == prev and used_context[i:i+len(prev)] == [0 for j in range(len(prev))]:
-                            used_context[i:i+len(prev)] = [1 for j in range(len(prev))]
-                            #print("Found!, used context updated: {}".format(used_context))
-                            found = True
-                            break
-                    if not found:
-                        if prev in prev_answer[:idx]:
-                            print("Duplicate overlapping answers, this is bad!")
-                            import pdb; pdb.set_trace()
-                        #else:
-                        #    print("Non-duplicate overlapping, we'll allow this for now")
+                ## Allow a max of 5 answers per question
+                if len(prev_answer) >= 5:
+                    used_context = [1 for i in range(len(context))]
+                else:
+                    ## Sort previous answers from longest to smallest, hopefully this will get around weird overlapping issues
+                    prev_answer = sorted(prev_answer, key=len, reverse=True)
+                    for idx, prev in enumerate(prev_answer):
+                        found = False
+                        for i in range(len(used_context)):
+                            ## When a non-overlapping previous candidate is found, mark it as used context
+                            if context[i:i+len(prev)].tolist() == prev and used_context[i:i+len(prev)] == [0 for j in range(len(prev))]:
+                                used_context[i:i+len(prev)] = [1 for j in range(len(prev))]
+                                #print("Found!, used context updated: {}".format(used_context))
+                                found = True
+                                break
+                        if not found:
+                            if prev in prev_answer[:idx]:
+                                print("Duplicate overlapping answers, this is bad!")
+                                import pdb; pdb.set_trace()
+                            #else:
+                            #    print("Non-duplicate overlapping, we'll allow this for now")
 
                 if not cur_answer:
                     ## If no current answer has been started yet, allow all unused context
