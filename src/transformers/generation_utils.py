@@ -1566,11 +1566,11 @@ class GenerationMixin:
             ## The last candidate is first thanks to it being reversed
             cur_cand = cur_tokens[:answer_delim_idx]
             cur_cand.reverse()
-            cur_restricted_cands[beam_idx] = cur_cand
+            cur_answers[beam_idx] = cur_cand
             ## track previously generated candidates (flip back to be the right order)
             prev_cands = cur_tokens[answer_delim_idx:]
             prev_cands.reverse()
-            prev_restricted_cands[beam_idx] = self.split_list(prev_cands, answer_delim)
+            prev_answers[beam_idx] = self.split_list(prev_cands, answer_delim)
             import pdb; pdb.set_trace()
             ## If answer delimiter is found, save the previous answer(s)
             prev_answers[beam_idx], cur_answers[beam_idx] = self.split_list(all_answers, answer_delim)
