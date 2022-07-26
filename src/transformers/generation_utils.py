@@ -1749,10 +1749,10 @@ class GenerationMixin:
             else:
                 print("ERROR Should be done? Debug")
                 import pdb; pdb.set_trace()
-        real_next_tokens = torch.argmax(next_tokens_scores, dim=-1)
-        print("Real next token: {}".format(constrained_next_tokens))
+        real_next_tokens = torch.argmax(scores, dim=-1)
+        print("Real next token: {}".format(real_next_tokens))
         scores = self.mask_vocab(scores, beam_idx, valid_mask_list)
-        constrained_next_tokens = torch.argmax(next_tokens_scores, dim=-1)
+        constrained_next_tokens = torch.argmax(scores, dim=-1)
         print("Constrained next token: {}".format(constrained_next_tokens))
         import pdb; pdb.set_trace()
         #print("\nSCORES: {}".format([scores[v[0]][v[1]] for v in valid_mask_list]))
