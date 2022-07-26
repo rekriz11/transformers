@@ -1543,6 +1543,7 @@ class GenerationMixin:
             )
 
     ## Splits list by a delimiter
+    '''
     def split_list(self, listy, delimiter):
         split = [list(group) for k, group in groupby(listy, lambda x: x == delimiter)]
         split = [[c for c in answer if c != delimiter] for answer in split]
@@ -1551,12 +1552,26 @@ class GenerationMixin:
             delimiter, prev_answers, cur_answer))
         import pdb; pdb.set_trace()
         return prev_answers, cur_answer
+    '''
+    def split_list(self, listy, delimiter):
+        split = [list(group) for k, group in groupby(listy, lambda x: x == delimiter) if not k][1:]
+        print("listy: {}, delimiter: {}, split: {}".format(listy, delimiter, split))
+        return split
 
     def split_slot_answers(self, cur_tokens, answer_start_idx, answer_delim, prev_answers, cur_answers, beam_idx):
         all_answers = cur_tokens[answer_start_idx:]
         try:
             ## Determine if there's a finished answer found
             answer_delim_idx = all_answers.index(answer_delim)
+            ## The last candidate is first thanks to it being reversed
+            cur_cand = cur_tokens[:answer_delim_idx]
+            cur_cand.reverse()
+            cur_restricted_cands[beam_idx] = cur_cand
+            ## track previously generated candidates (flip back to be the right order)
+            prev_cands = cur_tokens[answer_delim_idx:]
+            prev_cands.reverse()
+            prev_restricted_cands[beam_idx] = self.split_list(prev_cands, answer_delim)
+            import pdb; pdb.set_trace()
             ## If answer delimiter is found, save the previous answer(s)
             prev_answers[beam_idx], cur_answers[beam_idx] = self.split_list(all_answers, answer_delim)
         except ValueError:
