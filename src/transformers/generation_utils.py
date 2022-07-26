@@ -1667,19 +1667,19 @@ class GenerationMixin:
             if forced_answer[beam_idx]:
                 ## Finds all previous candidates in the context
                 used_context = [0 for i in range(len(context))]
+                ## Sort previous answers from longest to smallest, hopefully this will get around weird overlapping issues
+                prev_answer = sorted(prev_answer, key=len, reverse=True)
                 for prev in prev_answer:
                     found = False
                     for i in range(len(used_context)):
                         ## When a non-overlapping previous candidate is found, mark it as used context
-                        if context[i:i+len(prev)].tolist() == prev:
-                            ## Remove this for now, too complicated; as long as it's found we're fine
-                            ## and used_context[i:i+len(prev)] == [0 for j in range(len(prev))]:
+                        if context[i:i+len(prev)].tolist() == prev and used_context[i:i+len(prev)] == [0 for j in range(len(prev))]:
                             used_context[i:i+len(prev)] = [1 for j in range(len(prev))]
-                            #print("Found!, used context updated: {}".format(used_context))
+                            print("Found!, used context updated: {}".format(used_context))
                             found = True
                             break
                     if not found:
-                        print("Previous answer not found!!")
+                        print("Overlapping answers!!!")
                         import pdb; pdb.set_trace()
 
                 if not cur_answer:
