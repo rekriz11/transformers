@@ -1707,19 +1707,23 @@ class GenerationMixin:
                             ## If we've generated all forced candidates, allow EOS
                             valid_mask_list.append([beam_idx, eos_token_id])
                 else:
-                    ## Otherwise, the current answer has been started
-                    valid_mask_list = []
-                    ## Iterate through input text to find all instances of the answer that has been generated so far,
-                    for idx in range(len(context) - len(cur_answer)):
-                        #print("\nSTART_IDX: {}, CUR_ANSWER: {}, CONTEXT: {}, USED_CONTEXT: {}".format(idx, \
-                        #    cur_answer, context[idx:idx+len(cur_answer)].tolist(), used_context[idx:idx+len(cur_answer)]))
-                        if context[idx:idx+len(cur_answer)].tolist() == cur_answer and \
-                        used_context[idx:idx+len(cur_answer)] == [0 for j in range(len(cur_answer))]:
-                            ## The next subword following each instance is a valid next step, 
-                            ## unless it's been used by a previous candidate
-                            valid_mask_list.append([beam_idx, context[idx+len(cur_answer)]])
-                    ## Always allow the answer delimiter
-                    valid_mask_list.append([beam_idx, answer_delim])
+                    ## If the model generated the empty answer, only allow the slot delimiter
+                    if cur_answer == [empty_answer]:
+                        valid_mask_list.append([beam_idx, slot_delim])
+                    else:
+                        ## Otherwise, the current answer has been started with a non-empty answer
+                        valid_mask_list = []
+                        ## Iterate through input text to find all instances of the answer that has been generated so far,
+                        for idx in range(len(context) - len(cur_answer)):
+                            #print("\nSTART_IDX: {}, CUR_ANSWER: {}, CONTEXT: {}, USED_CONTEXT: {}".format(idx, \
+                            #    cur_answer, context[idx:idx+len(cur_answer)].tolist(), used_context[idx:idx+len(cur_answer)]))
+                            if context[idx:idx+len(cur_answer)].tolist() == cur_answer and \
+                            used_context[idx:idx+len(cur_answer)] == [0 for j in range(len(cur_answer))]:
+                                ## The next subword following each instance is a valid next step, 
+                                ## unless it's been used by a previous candidate
+                                valid_mask_list.append([beam_idx, context[idx+len(cur_answer)]])
+                        ## Always allow the answer delimiter
+                        valid_mask_list.append([beam_idx, answer_delim])
                 #print("FORCED CONTEXT for idx {}, cur_answer: {}\nvalid_mask_list: {}".format(beam_idx, cur_answer, valid_mask_list))
                 #import pdb; pdb.set_trace()
             elif forced_slot[beam_idx]:
