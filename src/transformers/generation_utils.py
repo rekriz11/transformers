@@ -1559,6 +1559,7 @@ class GenerationMixin:
         return split
 
     def split_slot_answers(self, cur_tokens, answer_start_idx, answer_delim, prev_answers, cur_answers, beam_idx):
+        import pdb; pdb.set_trace()
         all_answers = cur_tokens[answer_start_idx:]
         try:
             ## Determine if there's a finished answer found
@@ -1635,6 +1636,7 @@ class GenerationMixin:
                 slot_delim_idx = len(cur_tokens) - cur_tokens.index(slot_delim)
                 cur_tokens.reverse()
             except ValueError:
+                cur_tokens.reverse()
                 ## If slot delimiter not found, need to finish forced generation of answers for the first slot
                 print("Slot delimiter {} not found in candidate {}".format(slot_delim, cur_tokens))
                 forced_answer[beam_idx] = 1
