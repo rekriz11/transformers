@@ -1751,7 +1751,7 @@ class GenerationMixin:
                 import pdb; pdb.set_trace()
         prev_ids = input_ids[0][input_length:].tolist()
         prev_tokens = tokenizer.convert_ids_to_tokens(prev_ids)
-        print("Previous ids: {}\nprev_tokens: {}\n".format(prev_tokens))
+        print("Previous ids: {}\nprev_tokens: {}\n".format(prev_ids, prev_tokens))
         real_next_id = torch.argmax(scores, dim=-1).item()
         real_next_token = tokenizer.convert_ids_to_tokens(real_next_id)
         print("Real next id: {}, token: {}".format(real_next_id, real_next_token))
