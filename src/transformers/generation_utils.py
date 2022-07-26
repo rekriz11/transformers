@@ -1669,7 +1669,7 @@ class GenerationMixin:
                 used_context = [0 for i in range(len(context))]
                 ## Sort previous answers from longest to smallest, hopefully this will get around weird overlapping issues
                 prev_answer = sorted(prev_answer, key=len, reverse=True)
-                for prev in prev_answer:
+                for idx, prev in enumerate(prev_answer):
                     found = False
                     for i in range(len(used_context)):
                         ## When a non-overlapping previous candidate is found, mark it as used context
@@ -1679,8 +1679,11 @@ class GenerationMixin:
                             found = True
                             break
                     if not found:
-                        print("Overlapping answers!!!")
-                        import pdb; pdb.set_trace()
+                        if prev in prev_answer[:idx]:
+                            print("Duplicate overlapping answers, this is bad!")
+                            import pdb; pdb.set_trace()
+                        else:
+                            print("Non-duplicate overlapping, we'll allow this for now")
 
                 if not cur_answer:
                     ## If no current answer has been started yet, allow all unused context
