@@ -1649,6 +1649,9 @@ class GenerationMixin:
             ## At this point, we know that a slot delimiter has been generated
             ## To track the slot delimiter index, count number of slot delimiters found in what's been generated so far
             forced_slot[beam_idx] = cur_tokens.count(slot_delim) + 1
+            ## If we've finished generating all constraints, set to zero so we can generate EOS and be done!
+            if forced_slot[beam_idx] > len(slot_constraints):
+                forced_slot[beam_idx] = 0
             cur_slots[beam_idx] = cur_tokens[slot_delim_idx:]
 
             ## If answer start delimiter has been found more recently than the slot delimiter,
@@ -1700,12 +1703,15 @@ class GenerationMixin:
                     valid_mask_list = [[beam_idx, v] for v in list(set(cur_valid_candidates))]
                     if prev_answer:
                         ## If there are previous answers for this slot, the model doesn't have to generate any more
+                        valid_mask_list.append([beam_idx, slot_delim])
+                        '''
                         if forced_slot[beam_idx] < len(slot_constraints):
                             ## If we haven't generated all forced candidates, allow the slot delimiter
                             valid_mask_list.append([beam_idx, slot_delim])
                         else:
                             ## If we've generated all forced candidates, allow EOS
                             valid_mask_list.append([beam_idx, eos_token_id])
+                        '''
                 else:
                     ## If the model generated the empty answer, only allow the slot delimiter
                     if cur_answer == [empty_answer]:
@@ -1754,6 +1760,7 @@ class GenerationMixin:
                 #print("FORCED SLOT, for idx {}, cur_slot: {}, valid_mask_list: {}".format(beam_idx, cur_slot, valid_mask_list))
             else:
                 print("ERROR Should be done? Debug")
+                valid_mask_list.append([beam_idx, eos_token_id])
                 import pdb; pdb.set_trace()
         prev_ids = input_ids[0][input_length:].tolist()
         prev_tokens = tokenizer.convert_ids_to_tokens(prev_ids)
