@@ -1600,7 +1600,7 @@ class GenerationMixin:
             scores[beam_idx] = scores[beam_idx].masked_fill(valid_mask[beam_idx], -float("inf"))
         return scores
 
-    ## Added constrained generation helper to only allow generation of valid candidates after delimiter
+    ## Added constrained generation helper to only allow generation from the input
     def set_scores_to_inf_for_invalid_inputs(self, scores, input_ids, slot_constraints, context, empty_answer, delimiters, eos_token_id, input_length, tokenizer):
         [answer_start_delim, answer_delim, slot_delim] = delimiters
         forced_slot, cur_slots = [0 for i in range(scores.shape[0])], [[] for i in range(scores.shape[0])]
@@ -1782,8 +1782,8 @@ class GenerationMixin:
         #print("\nSCORES: {}".format([scores[v[0]][v[1]] for v in valid_mask_list]))
         return scores
 
-    ## Added constrained generation helper to only allow generation of valid candidates after delimiter
-    def set_scores_to_inf_for_invalid_inputs(self, scores, input_ids, slot_constraints, context, empty_answer, delimiters, eos_token_id, input_length, tokenizer):
+    ## Added constrained generation helper to only allow generation of valid candidates
+    def set_scores_to_inf_for_invalid_candidates(self, scores, input_ids, slot_constraints, context, empty_answer, delimiters, eos_token_id, input_length, tokenizer):
         [answer_start_delim, answer_delim, slot_delim] = delimiters
         forced_slot, cur_slots = [0 for i in range(scores.shape[0])], [[] for i in range(scores.shape[0])]
         forced_answer = [0 for i in range(scores.shape[0])]
@@ -2145,7 +2145,7 @@ class GenerationMixin:
                 next_tokens_scores = self.set_scores_to_inf_for_invalid_inputs(next_tokens_scores, input_ids, \
                     slot_constraints, valid_input, empty_answer, delimiters, eos_token_id, input_length, tokenizer)
             elif constrained_decoding_type == 'constrained_template_candidates':
-                next_tokens_scores = self.set_scores_to_inf_for_invalid_inputs(next_tokens_scores, input_ids, \
+                next_tokens_scores = self.set_scores_to_inf_for_invalid_candidates(next_tokens_scores, input_ids, \
                     slot_constraints, valid_input, empty_answer, delimiters, eos_token_id, input_length, tokenizer)
             
             # Store scores, attentions and hidden_states when required
