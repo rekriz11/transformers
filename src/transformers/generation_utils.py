@@ -1688,9 +1688,10 @@ class GenerationMixin:
                                 found = True
                                 break
                         if not found:
+                            ## If overlapping and duplicate answers occur, don't allow any more answers
                             if prev in prev_answer[:idx]:
-                                print("Duplicate overlapping answers, this is bad!")
-                                import pdb; pdb.set_trace()
+                                #print("Duplicate overlapping answers, this is bad!")
+                                used_context = [1 for i in range(len(context))]
                             #else:
                             #    print("Non-duplicate overlapping, we'll allow this for now")
 
@@ -1716,6 +1717,9 @@ class GenerationMixin:
                     ## If the model generated the empty answer, only allow the slot delimiter
                     if cur_answer == [empty_answer]:
                         valid_mask_list.append([beam_idx, slot_delim])
+                    ## If the answer is too long, just cut it off
+                    elif len(cur_answer) >= 10:
+                        valid_mask_list.append([beam_idx, answer_delim])
                     else:
                         ## Otherwise, the current answer has been started with a non-empty answer
                         valid_mask_list = []
@@ -1760,18 +1764,18 @@ class GenerationMixin:
                 #print("FORCED SLOT, for idx {}, cur_slot: {}, valid_mask_list: {}".format(beam_idx, cur_slot, valid_mask_list))
             else:
                 valid_mask_list.append([beam_idx, eos_token_id])
-        prev_ids = input_ids[0][input_length:].tolist()
-        prev_tokens = tokenizer.convert_ids_to_tokens(prev_ids)
-        print("Previous ids: {}\nprev_tokens: {}\n".format(prev_ids, prev_tokens))
-        real_next_id = torch.argmax(scores, dim=-1).item()
-        real_score = scores[0][real_next_id].item()
-        real_next_token = tokenizer.convert_ids_to_tokens(real_next_id)
-        print("Real next id: {}, token: {}, real_score: {}".format(real_next_id, real_next_token, real_score))
+        #prev_ids = input_ids[0][input_length:].tolist()
+        #prev_tokens = tokenizer.convert_ids_to_tokens(prev_ids)
+        #print("Previous ids: {}\nprev_tokens: {}\n".format(prev_ids, prev_tokens))
+        #real_next_id = torch.argmax(scores, dim=-1).item()
+        #real_score = scores[0][real_next_id].item()
+        #real_next_token = tokenizer.convert_ids_to_tokens(real_next_id)
+        #print("Real next id: {}, token: {}, real_score: {}".format(real_next_id, real_next_token, real_score))
         scores = self.mask_vocab(scores, beam_idx, valid_mask_list)
-        constrained_next_id = torch.argmax(scores, dim=-1).item()
-        constrained_score = scores[0][constrained_next_id].item()
-        constrained_next_token = tokenizer.convert_ids_to_tokens(constrained_next_id)
-        print("Constrained next id: {}, token: {}, score: {}".format(constrained_next_id, constrained_next_token, constrained_score))
+        #constrained_next_id = torch.argmax(scores, dim=-1).item()
+        #constrained_score = scores[0][constrained_next_id].item()
+        #constrained_next_token = tokenizer.convert_ids_to_tokens(constrained_next_id)
+        #print("Constrained next id: {}, token: {}, score: {}".format(constrained_next_id, constrained_next_token, constrained_score))
         #import pdb; pdb.set_trace()
         #print("\nSCORES: {}".format([scores[v[0]][v[1]] for v in valid_mask_list]))
         return scores
@@ -1952,7 +1956,7 @@ class GenerationMixin:
             next_tokens_scores = logits_processor(input_ids, next_token_logits)
             ## Added function for constrained decoding
             if slot_constraints is not None:
-                print("\n#####STEP {}####".format(step))
+                #print("\n#####STEP {}####".format(step))
                 next_tokens_scores = self.set_scores_to_inf_for_invalid_candidates(next_tokens_scores, input_ids, \
                     slot_constraints, valid_input, empty_answer, delimiters, eos_token_id, input_length, tokenizer)
             
