@@ -1545,21 +1545,11 @@ class GenerationMixin:
             )
 
     ## Splits list by a delimiter
-    '''
-    def split_list(self, listy, delimiter):
-        split = [list(group) for k, group in groupby(listy, lambda x: x == delimiter)]
-        split = [[c for c in answer if c != delimiter] for answer in split]
-        prev_answers, cur_answer = split[:-1], split[-1]
-        print("listy: {}, delimiter: {}, prev_answers: {}, cur_answer: {}".format(listy, \
-            delimiter, prev_answers, cur_answer))
-        import pdb; pdb.set_trace()
-        return prev_answers, cur_answer
-    '''
     def split_list(self, listy, delimiter):
         split = [list(group) for k, group in groupby(listy, lambda x: x == delimiter) if not k]
-        #print("listy: {}, delimiter: {}, split: {}".format(listy, delimiter, split))
         return split
 
+    ## Splits into current answer and all previous answers
     def split_slot_answers(self, cur_tokens, answer_start_idx, answer_delim, prev_answers, cur_answers, beam_idx):
         all_answers = cur_tokens[answer_start_idx:]
         ## Reverse so current answer is first!
@@ -1575,7 +1565,6 @@ class GenerationMixin:
             prev_cands = all_answers[answer_delim_idx:]
             prev_cands.reverse()
             prev_answers[beam_idx] = self.split_list(prev_cands, answer_delim)
-            #import pdb; pdb.set_trace()
         except ValueError:
             ## If answer delimiter not found, there are no previous answers 
             ## and need to finish generating the first answer
@@ -1691,25 +1680,25 @@ class GenerationMixin:
                         import pdb; pdb.set_trace()
             else:
                 valid_mask_list.append([beam_idx, eos_token_id])
-
-        prev_ids = input_ids[0][input_length:].tolist()
-        prev_tokens = tokenizer.convert_ids_to_tokens(prev_ids)
-        print("Previous ids: {}\nprev_tokens: {}\n".format(prev_ids, prev_tokens))
-        real_next_id = torch.argmax(scores, dim=-1).item()
-        real_score = scores[0][real_next_id].item()
-        real_next_token = tokenizer.convert_ids_to_tokens(real_next_id)
-        print("Real next id: {}, token: {}, real_score: {}".format(real_next_id, real_next_token, real_score))
+        #prev_ids = input_ids[0][input_length:].tolist()
+        #prev_tokens = tokenizer.convert_ids_to_tokens(prev_ids)
+        #print("Previous ids: {}\nprev_tokens: {}\n".format(prev_ids, prev_tokens))
+        #real_next_id = torch.argmax(scores, dim=-1).item()
+        #real_score = scores[0][real_next_id].item()
+        #real_next_token = tokenizer.convert_ids_to_tokens(real_next_id)
+        #print("Real next id: {}, token: {}, real_score: {}".format(real_next_id, real_next_token, real_score))
+        ## If there's something in the mask list, make sure to mask everything else
         if valid_mask_list:
             scores = self.mask_vocab(scores, beam_idx, valid_mask_list)
-            constrained_next_id = torch.argmax(scores, dim=-1).item()
-            constrained_score = scores[0][constrained_next_id].item()
-            constrained_next_token = tokenizer.convert_ids_to_tokens(constrained_next_id)
-            print("Constrained next id: {}, token: {}, score: {}".format(constrained_next_id, constrained_next_token, constrained_score))
-            if real_next_id != constrained_next_id:
-                print("Not the same!")
-                import pdb; pdb.set_trace()
-        else:
-            print("No constraints in place")
+            #constrained_next_id = torch.argmax(scores, dim=-1).item()
+            #constrained_score = scores[0][constrained_next_id].item()
+            #constrained_next_token = tokenizer.convert_ids_to_tokens(constrained_next_id)
+            #print("Constrained next id: {}, token: {}, score: {}".format(constrained_next_id, constrained_next_token, constrained_score))
+            #if real_next_id != constrained_next_id:
+            #    print("Not the same!")
+            #    import pdb; pdb.set_trace()
+        #else:
+        #    print("No constraints in place")
         return scores
 
     ## Added constrained generation helper to only allow generation from the input
@@ -1858,188 +1847,6 @@ class GenerationMixin:
         #constrained_score = scores[0][constrained_next_id].item()
         #constrained_next_token = tokenizer.convert_ids_to_tokens(constrained_next_id)
         #print("Constrained next id: {}, token: {}, score: {}".format(constrained_next_id, constrained_next_token, constrained_score))
-        return scores
-
-    ## Added constrained generation helper to only allow generation of valid candidates
-    def set_scores_to_inf_for_invalid_candidates(self, scores, input_ids, slot_constraints, valid_candidates, empty_answer, delimiters, eos_token_id, input_length, tokenizer):
-        [answer_start_delim, answer_delim, slot_delim] = delimiters
-        forced_slot, cur_slots = [0 for i in range(scores.shape[0])], [[] for i in range(scores.shape[0])]
-        forced_answer = [0 for i in range(scores.shape[0])]
-        prev_answers, cur_answers = [[] for i in range(scores.shape[0])], [[] for i in range(scores.shape[0])]
-        for beam_idx in range(scores.shape[0]):
-            cur_tokens = input_ids[beam_idx][input_length:].tolist()
-            #print("cur_tokens: {}".format(cur_tokens))
-            if cur_tokens != [] and (cur_tokens[-1] == 2 or cur_tokens.count(eos_token_id) >= 1):
-                #print("Should be done generating!")
-                continue
-            
-            ## Check for answer start phrase, which will come when a slot question is finished
-            answer_start_idx, cur_tokens_temp = -1, cur_tokens
-            while len(cur_tokens_temp) > len(answer_start_delim):
-                if cur_tokens_temp[-len(answer_start_delim):] == answer_start_delim:
-                    ## If cur_tokens_temp ends with minor delimiter, we found it!
-                    answer_start_idx = len(cur_tokens_temp)
-                    break
-                else:
-                    ## Otherwise, remove the last token and keep looking
-                    cur_tokens_temp = cur_tokens_temp[:-1]
-
-            ## If answer start phrase is not found at all, mark this as needing to finish the first slot question
-            if answer_start_idx == -1:
-                #print("Answer start delimiter {} not found in candidate {}".format(answer_start_delim, cur_tokens))
-                forced_slot[beam_idx] = 1
-                cur_slots[beam_idx] = cur_tokens
-                continue
-
-
-            ## Checking for slot delimiter            
-            try:
-                ## Reversing means a simple index will find the last (most recent) slot delimiter
-                cur_tokens.reverse()
-                slot_delim_idx = len(cur_tokens) - cur_tokens.index(slot_delim)
-                cur_tokens.reverse()
-            except ValueError:
-                cur_tokens.reverse()
-                ## If slot delimiter not found, need to finish forced generation of answers for the first slot
-                #print("Slot delimiter {} not found in candidate {}".format(slot_delim, cur_tokens))
-                forced_answer[beam_idx] = 1
-                ## Split up previous slot answers and curent answers
-                prev_answers, cur_answers = self.split_slot_answers(cur_tokens, answer_start_idx, \
-                    answer_delim, prev_answers, cur_answers, beam_idx)
-                continue
-
-            ## At this point, we know that a slot delimiter has been generated
-            ## To track the slot delimiter index, count number of slot delimiters found in what's been generated so far
-            forced_slot[beam_idx] = cur_tokens.count(slot_delim) + 1
-            ## If we've finished generating all constraints, set to zero so we can generate EOS and be done!
-            if forced_slot[beam_idx] > len(slot_constraints):
-                forced_slot[beam_idx] = 0
-            cur_slots[beam_idx] = cur_tokens[slot_delim_idx:]
-
-            ## If answer start delimiter has been found more recently than the slot delimiter,
-            ## force generation of answers for the current slot
-            if answer_start_idx > slot_delim_idx:
-                forced_answer[beam_idx] = 1
-                prev_inputs, cur_inputs = self.split_slot_answers(cur_tokens, answer_start_idx, \
-                    answer_delim, prev_answers, cur_answers, beam_idx)
-
-        #print("\ndelimiters: {}\n\nforced_slot: {}\ncur_slots: {}\n\nforced_answer: {}\nprev_answers: {}\ncur_answers: {}".format(delimiters, \
-        #    forced_slot, cur_slots, forced_answer, prev_answers, cur_answers))
-
-        for beam_idx, (cur_slot, cur_answer, prev_answer) in enumerate(zip(cur_slots, cur_answers, prev_answers)):
-            if len(input_ids) > 1 and input_ids[beam_idx].tolist().count(eos_token_id) >= 2:
-                #print("No more masking needed for idx {}, scores: {}".format(beam_idx, scores[beam_idx]))
-                continue
-            valid_mask_list = []
-            if forced_answer[beam_idx]:
-                ## Finds all previous candidates in the context
-                used_context = [0 for i in range(len(context))]
-                ## Allow a max of 5 answers per question
-                if len(prev_answer) >= 5:
-                    used_context = [1 for i in range(len(context))]
-                else:
-                    ## Sort previous answers from longest to smallest, hopefully this will get around weird overlapping issues
-                    prev_answer = sorted(prev_answer, key=len, reverse=True)
-                    for idx, prev in enumerate(prev_answer):
-                        found = False
-                        for i in range(len(used_context)):
-                            ## When a non-overlapping previous candidate is found, mark it as used context
-                            if context[i:i+len(prev)].tolist() == prev and used_context[i:i+len(prev)] == [0 for j in range(len(prev))]:
-                                used_context[i:i+len(prev)] = [1 for j in range(len(prev))]
-                                #print("Found!, used context updated: {}".format(used_context))
-                                found = True
-                                break
-                        if not found:
-                            ## If overlapping and duplicate answers occur, don't allow any more answers
-                            if prev in prev_answer[:idx]:
-                                #print("Duplicate overlapping answers, this is bad!")
-                                used_context = [1 for i in range(len(context))]
-                            #else:
-                            #    print("Non-duplicate overlapping, we'll allow this for now")
-
-                if not cur_answer:
-                    ## If no current answer has been started yet, allow all unused context
-                    cur_valid_candidates = [context[i] for i in range(len(context)) if used_context[i] == 0]
-                    if not prev_answer:
-                        ## Allow empty answer if no previous answers
-                        cur_valid_candidates.append(empty_answer)
-                    valid_mask_list = [[beam_idx, v] for v in list(set(cur_valid_candidates))]
-                    if prev_answer:
-                        ## If there are previous answers for this slot, the model doesn't have to generate any more
-                        valid_mask_list.append([beam_idx, slot_delim])
-                        '''
-                        if forced_slot[beam_idx] < len(slot_constraints):
-                            ## If we haven't generated all forced candidates, allow the slot delimiter
-                            valid_mask_list.append([beam_idx, slot_delim])
-                        else:
-                            ## If we've generated all forced candidates, allow EOS
-                            valid_mask_list.append([beam_idx, eos_token_id])
-                        '''
-                else:
-                    ## If the model generated the empty answer, only allow the slot delimiter
-                    if cur_answer == [empty_answer]:
-                        valid_mask_list.append([beam_idx, slot_delim])
-                    ## If the answer is too long, just cut it off
-                    elif len(cur_answer) >= 10:
-                        valid_mask_list.append([beam_idx, answer_delim])
-                    else:
-                        ## Otherwise, the current answer has been started with a non-empty answer
-                        valid_mask_list = []
-                        ## Iterate through input text to find all instances of the answer that has been generated so far,
-                        for idx in range(len(context) - len(cur_answer)):
-                            #print("\nSTART_IDX: {}, CUR_ANSWER: {}, CONTEXT: {}, USED_CONTEXT: {}".format(idx, \
-                            #    cur_answer, context[idx:idx+len(cur_answer)].tolist(), used_context[idx:idx+len(cur_answer)]))
-                            if context[idx:idx+len(cur_answer)].tolist() == cur_answer and \
-                            used_context[idx:idx+len(cur_answer)] == [0 for j in range(len(cur_answer))]:
-                                ## The next subword following each instance is a valid next step, 
-                                ## unless it's been used by a previous candidate
-                                valid_mask_list.append([beam_idx, context[idx+len(cur_answer)]])
-                        ## Always allow the answer delimiter
-                        valid_mask_list.append([beam_idx, answer_delim])
-                #print("FORCED CONTEXT for idx {}, cur_answer: {}\nvalid_mask_list: {}".format(beam_idx, cur_answer, valid_mask_list))
-                #import pdb; pdb.set_trace()
-            elif forced_slot[beam_idx]:
-                ## Subtract one from index to start at 0
-                constraint = slot_constraints[forced_slot[beam_idx]-1]
-                if not cur_slot:
-                    ## If slot constraint has not been started, only allow the first token
-                    valid_mask_list = [[beam_idx, constraint[0]]]
-                else:
-                    ## Check if slot constraint has been correctly generated so far
-                    if constraint[:len(cur_slot)].tolist() != cur_slot:
-                        valid_mask_list = []
-                        print("ERROR generating slot constraint!!")
-                        import pdb; pdb.set_trace()
-                    if len(constraint) > len(cur_slot):
-                        ## If slot constraint is unfinished, only allow model to generate next step
-                        valid_mask_list = [[beam_idx, constraint[len(cur_slot)]]]
-                    elif len(constraint) == len(cur_slot):
-                        ## If slot candidate is finished, allow model to generate any input subword (and unknown answer)
-                        ## NOTE: THIS SHOULD NOT BE GETTING TO, THROW AN ERROR
-                        print("ERROR, should be forcing from input!")
-                        import pdb; pdb.set_trace()
-                        #valid_mask_list = [[beam_idx, v] for v in context]
-                        #valid_mask_list.append([beam_idx, empty_answer])
-                    else:
-                        print("ERROR, check what went wrong!")
-                        import pdb; pdb.set_trace()
-                #print("FORCED SLOT, for idx {}, cur_slot: {}, valid_mask_list: {}".format(beam_idx, cur_slot, valid_mask_list))
-            else:
-                valid_mask_list.append([beam_idx, eos_token_id])
-        #prev_ids = input_ids[0][input_length:].tolist()
-        #prev_tokens = tokenizer.convert_ids_to_tokens(prev_ids)
-        #print("Previous ids: {}\nprev_tokens: {}\n".format(prev_ids, prev_tokens))
-        #real_next_id = torch.argmax(scores, dim=-1).item()
-        #real_score = scores[0][real_next_id].item()
-        #real_next_token = tokenizer.convert_ids_to_tokens(real_next_id)
-        #print("Real next id: {}, token: {}, real_score: {}".format(real_next_id, real_next_token, real_score))
-        scores = self.mask_vocab(scores, beam_idx, valid_mask_list)
-        #constrained_next_id = torch.argmax(scores, dim=-1).item()
-        #constrained_score = scores[0][constrained_next_id].item()
-        #constrained_next_token = tokenizer.convert_ids_to_tokens(constrained_next_id)
-        #print("Constrained next id: {}, token: {}, score: {}".format(constrained_next_id, constrained_next_token, constrained_score))
-        #import pdb; pdb.set_trace()
-        #print("\nSCORES: {}".format([scores[v[0]][v[1]] for v in valid_mask_list]))
         return scores
 
     def greedy_search(
@@ -2219,7 +2026,7 @@ class GenerationMixin:
             next_tokens_scores = logits_processor(input_ids, next_token_logits)
             ## Added function for constrained decoding
             if constrained_type == 'template_questions':
-                print("\n#####STEP {}####".format(step))
+                #print("\n#####STEP {}####".format(step))
                 next_tokens_scores = self.set_scores_to_inf_for_invalid_questions(next_tokens_scores, input_ids, \
                     slot_constraints, empty_answer, delimiters, eos_token_id, input_length, tokenizer)
             elif constrained_type == 'template_input':
