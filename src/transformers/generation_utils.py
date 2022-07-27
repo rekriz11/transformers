@@ -1663,7 +1663,7 @@ class GenerationMixin:
                 if len(prev_answer) >= 5 or cur_answer == [empty_answer]:
                     ## Allow a max of 5 answers per question, and force the model to move on after outputting empty answer
                     valid_mask_list.append([beam_idx, slot_delim])
-                elif len(cur_answer) >= 10:
+                elif len(cur_answer) >= 8:
                     ## Force the model to end the answer if it's 10 subwords long
                     valid_mask_list.append([beam_idx, answer_delim])
             elif forced_slot[beam_idx]:
@@ -1807,7 +1807,7 @@ class GenerationMixin:
                     if cur_answer == [empty_answer]:
                         valid_mask_list.append([beam_idx, slot_delim])
                     ## If the answer is too long, just cut it off
-                    elif len(cur_answer) >= 10:
+                    elif len(cur_answer) >= 8:
                         valid_mask_list.append([beam_idx, answer_delim])
                     else:
                         ## Otherwise, the current answer has been started with a non-empty answer
