@@ -1985,63 +1985,6 @@ class GenerationMixin:
         import pdb; pdb.set_trace()
         return scores
 
-    '''
-                ## Remove previously generated candidates from the list of valid candidates
-                cur_valid_candidates = [v.tolist() for v in valid_candidates[0]]
-                for cand in prev_cand:
-                    try:
-                        cur_valid_candidates.remove(cand)
-                    except ValueError:
-                        continue
-                ## Remove empty slot if previous candidates have already been generated (Not sure about this, may be helpful to keep as a fall back 
-                ## if decoding realizes there's no more good candidates after already starting to generated)
-                ## DON'T DO THIS FOR SAMPLING
-                if scores.shape[0] > 1 and not 'sampling' in constraint_type and prev_cand:
-                    cur_valid_candidates.remove(empty_slot)
-                #print("\nbeam_idx: {}\tremoved_candidates: {}\tempty_slot: {}\ncur_valid_candidates: {}".format(beam_idx, prev_cand, empty_slot, cur_valid_candidates))
-                ## If no candidate has been generated yet, allow the first subword of all candidates
-                if not restricted_cand:
-                    valid_mask_list = [[beam_idx, v2] for v2 in list(set([v[0] for v in cur_valid_candidates]))]
-                else:
-                    ## Need to find all candidates that start with what has been generated so far and are longer than what's been generated
-                    valid_cands_step = [v for v in cur_valid_candidates if restricted_cand == v[:len(restricted_cand)]]
-                    #print("valid_cands_step: {}".format(valid_cands_step))
-                    ## Ignore this if we're sampling
-                    if 'sampling' not in constraint_type:
-                        ## If the model does not think the empty slot is the most likely initial answer, remove it from consideration!
-                        if beam_idx != 0 and valid_cands_step == [empty_slot]:
-                            valid_cands_step.remove(empty_slot)
-                            #print("fixed valid_cands_step: {}".format(valid_cands_step))
-
-                        ## If a candidate higher up in the beam has already started the next question, 
-                        ## remove this entire candidate from consideration by setting everything to -inf
-                        if beam_idx != 0 and max(forced_cands[:beam_idx]) > forced_cands[beam_idx]:
-                            #print("beam_idx {} removed from consideration".format(beam_idx))
-                            valid_cands_step = []
-
-                    unfinished = [v for v in valid_cands_step if len(v) > len(restricted_cand)]
-                    valid_mask_list = [[beam_idx, v2] for v2 in list(set([v[len(restricted_cand)] for v in unfinished]))]
-                    ## If there are finished candidates, or there are no valid candidates,
-                    ## add delimiters and EOS as valid markers
-                    finished = [v for v in valid_cands_step if len(v) == len(restricted_cand)]
-                    if finished != []:
-                        #print("Finished candidates: {}, number of forced candidates generated so far: {}".format(finished, forced_cands[beam_idx]))
-                        if forced_cands[beam_idx] < len(forced_candidates[0]):
-                            ## If we haven't generated all forced candidates, allow the major delimiter
-                            valid_mask_list.append([beam_idx, slot_delimiters[0][0].item()])
-                            ## If we allow multiple answers for a single slot, allow the minor delimiter
-                            ## Don't allow if empty slot was just generated, or all candidates have already been generated
-                            #print("empty slot in finished? {}\nLengths of finished: {}, restricted_cand: {}, valid_candidates: {}".format(empty_slot in finished, \
-                            #    len(finished), len(restricted_cand), len(valid_candidates[0])))
-                            if 'multiple' in constraint_type and empty_slot not in finished \
-                            and len(finished) + len(restricted_cand) < len(valid_candidates[0]):
-                                valid_mask_list.append([beam_idx, slot_delimiters[0][1].item()])
-                        else:
-                            ## If we've generated all forced candidates, allow EOS
-                            valid_mask_list.append([beam_idx, 2])
-                #print("{} RESTRICTED, restricted_cand: {}, valid_mask_list: {}".format(beam_idx, restricted_cand, valid_mask_list))
-    '''
-
     def greedy_search(
         self,
         input_ids: torch.LongTensor,
