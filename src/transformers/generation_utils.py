@@ -1940,10 +1940,10 @@ class GenerationMixin:
                         ## Need to find all candidates that start with what has been generated so far and are longer than what's been generated
                         valid_cands_step = [v for v in cur_valid_candidates if cur_answer == v[:len(cur_answer)]]
                         ## These are the unfinished candidates                  
-                        unfinished = [v for v in valid_cands_step if len(v) > len(restricted_cand)]
-                        valid_mask_list = [[beam_idx, v2] for v2 in list(set([v[len(restricted_cand)] for v in unfinished]))]
+                        unfinished = [v for v in valid_cands_step if len(v) > len(cur_answer)]
+                        valid_mask_list = [[beam_idx, v2] for v2 in list(set([v[len(cur_answer)] for v in unfinished]))]
                         ## If there are finished candidates add the answer delimiter
-                        finished = [v for v in valid_cands_step if len(v) == len(restricted_cand)]
+                        finished = [v for v in valid_cands_step if len(v) == len(cur_answer)]
                         if finished != []:
                             valid_mask_list.append([beam_idx, answer_delim])
                 if valid_mask_list == []:
