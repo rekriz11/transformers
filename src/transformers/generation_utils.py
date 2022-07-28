@@ -1914,13 +1914,13 @@ class GenerationMixin:
                 ## Remove previously generated candidates from the list of valid candidates
                 cur_valid_candidates = [v.tolist() for v in valid_candidates]
                 print("intial cur_valid_candidates: {}".format(cur_valid_candidates))
-                for prev in prev_answers:
+                for prev in prev_answer:
                     try:
                         cur_valid_candidates.remove(prev)
                     except ValueError:
                         print("ERROR, previous answer not found!")
                         import pdb; pdb.set_trace()
-                if prev_answers:
+                if prev_answer:
                     print("updated cur_valid_candidates: {}".format(cur_valid_candidates))
                 if not cur_answer:
                     ## If no candidate has been generated yet, allow the first subword of all candidates
@@ -2177,6 +2177,7 @@ class GenerationMixin:
                 next_tokens_scores = self.set_scores_to_inf_for_invalid_inputs(next_tokens_scores, input_ids, \
                     slot_constraints, valid_input, empty_answer, delimiters, eos_token_id, input_length, tokenizer)
             elif constrained_type == 'template_candidates':
+                print("\n#####STEP {}####".format(step))
                 next_tokens_scores = self.set_scores_to_inf_for_invalid_candidates(next_tokens_scores, input_ids, \
                     slot_constraints, valid_candidates, empty_answer, delimiters, eos_token_id, input_length, tokenizer)
             
