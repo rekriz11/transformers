@@ -1982,7 +1982,7 @@ class GenerationMixin:
         real_next_token = tokenizer.convert_ids_to_tokens(real_next_id)
         print("Real next id: {}, token: {}, real_score: {}".format(real_next_id, real_next_token, real_score))
         scores = self.mask_vocab(scores, beam_idx, valid_mask_list)
-        valid_scores = [(v, scores[v[0]][v[1]]) for v in valid_mask_list]
+        valid_scores = [(v[1].item(), tokenizer.convert_ids_to_tokens(v[1].item()), scores[v[0]][v[1]]) for v in valid_mask_list]
         print("Valid scores: {}".format(valid_scores))
         constrained_next_id = torch.argmax(scores, dim=-1).item()
         constrained_score = scores[0][constrained_next_id].item()
