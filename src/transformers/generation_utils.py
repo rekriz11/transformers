@@ -1912,12 +1912,16 @@ class GenerationMixin:
             valid_mask_list = []
             if forced_answer[beam_idx]:
                 ## Remove previously generated candidates from the list of valid candidates
-                cur_valid_candidates = [v.tolist() for v in valid_candidates[0]]
+                cur_valid_candidates = [v.tolist() for v in valid_candidates]
+                print("intial cur_valid_candidates: {}".format(cur_valid_candidates))
                 for prev in prev_answers:
                     try:
                         cur_valid_candidates.remove(prev)
                     except ValueError:
-                        continue
+                        print("ERROR, previous answer not found!")
+                        import pdb; pdb.set_trace()
+                if prev_answers:
+                    print("updated cur_valid_candidates: {}".format(cur_valid_candidates))
                 if not cur_answer:
                     ## If no candidate has been generated yet, allow the first subword of all candidates
                     cur_valid_candidates = list(set([v[0] for v in cur_valid_candidates]))
@@ -1978,6 +1982,8 @@ class GenerationMixin:
         real_next_token = tokenizer.convert_ids_to_tokens(real_next_id)
         print("Real next id: {}, token: {}, real_score: {}".format(real_next_id, real_next_token, real_score))
         scores = self.mask_vocab(scores, beam_idx, valid_mask_list)
+        valid_scores = [(v, scores[v[0]][v[1]]) for v in valid_mask_list]
+        print("Valid scores: {}".format(valid_scores))
         constrained_next_id = torch.argmax(scores, dim=-1).item()
         constrained_score = scores[0][constrained_next_id].item()
         constrained_next_token = tokenizer.convert_ids_to_tokens(constrained_next_id)
