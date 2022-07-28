@@ -2172,7 +2172,7 @@ class GenerationMixin:
                     slot_constraints, valid_input, empty_answer, delimiters, eos_token_id, input_length, tokenizer)
             elif constrained_type == 'template_candidates':
                 next_tokens_scores = self.set_scores_to_inf_for_invalid_candidates(next_tokens_scores, input_ids, \
-                    slot_constraints, valid_input, empty_answer, delimiters, eos_token_id, input_length, tokenizer)
+                    slot_constraints, valid_candidates, empty_answer, delimiters, eos_token_id, input_length, tokenizer)
             
             # Store scores, attentions and hidden_states when required
             if return_dict_in_generate:
