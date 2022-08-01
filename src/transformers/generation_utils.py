@@ -1985,16 +1985,13 @@ class GenerationMixin:
         print("Valid_mask_list: {}".format(valid_mask_list))
         vidx, vtokens, vscores = [], [], []
         for v in valid_mask_list:
-            print(v)
-            print(v[1].item())
-            print("\n\n")
             try:
                 vidx.append(v[1].item())
                 vtokens.append(tokenizer.convert_ids_to_tokens(v[1].item()))
             except AttributeError:
                 vidx.append(v[1])
                 vtokens.append(tokenizer.convert_ids_to_tokens(v[1]))
-            vscores = scores[v[0]][v[1]]
+            vscores.append(scores[v[0]][v[1]])
         sorted_idx = sorted(range(len(vscores)), key=lambda k: vscores[k], reverse=True)
         constrained_next_id = torch.argmax(scores, dim=-1).item()
         constrained_score = scores[0][constrained_next_id].item()
