@@ -1913,15 +1913,15 @@ class GenerationMixin:
             if forced_answer[beam_idx]:
                 ## Remove previously generated candidates from the list of valid candidates
                 cur_valid_candidates = [v.tolist() for v in valid_candidates]
-                print("intial cur_valid_candidates: {}".format(cur_valid_candidates))
+                #print("intial cur_valid_candidates: {}".format(cur_valid_candidates))
                 for prev in prev_answer:
                     try:
                         cur_valid_candidates.remove(prev)
                     except ValueError:
                         print("ERROR, previous answer not found!")
                         import pdb; pdb.set_trace()
-                if prev_answer:
-                    print("updated cur_valid_candidates: {}".format(cur_valid_candidates))
+                #if prev_answer:
+                #    print("updated cur_valid_candidates: {}".format(cur_valid_candidates))
                 if not cur_answer:
                     ## If no candidate has been generated yet, allow the first subword of all candidates
                     cur_valid_candidates = list(set([v[0] for v in cur_valid_candidates]))
@@ -1982,16 +1982,22 @@ class GenerationMixin:
         real_next_token = tokenizer.convert_ids_to_tokens(real_next_id)
         print("Real next id: {}, token: {}, real_score: {}".format(real_next_id, real_next_token, real_score))
         scores = self.mask_vocab(scores, beam_idx, valid_mask_list)
-        try:
-            valid_scores = [(v[1].item(), tokenizer.convert_ids_to_tokens(v[1].item()), scores[v[0]][v[1]]) for v in valid_mask_list]
-        except AttributeError:
-            valid_scores = [(v[1], tokenizer.convert_ids_to_tokens(v[1]), scores[v[0]][v[1]]) for v in valid_mask_list]
-        print("Valid scores: {}".format(valid_scores))
+        vidx, vtokens, vscores = [], [], []
+        for v in valid_mask_list:
+            try:
+                vidx.append(v[1].item())
+                vtokens.append(tokenizer.convert_ids_to_tokens(v[1].item()))
+            except AttributeError:
+                vidx.append(v[1])
+                vtokens.append(tokenizer.convert_ids_to_tokens(v[1]))
+            vscores = scores[v[0]][v[1]]
+        sorted_idx = sorted(range(len(vscores)), key=lambda k: vscores[k], reverse=True)
         constrained_next_id = torch.argmax(scores, dim=-1).item()
         constrained_score = scores[0][constrained_next_id].item()
         constrained_next_token = tokenizer.convert_ids_to_tokens(constrained_next_id)
         print("Constrained next id: {}, token: {}, score: {}\n".format(constrained_next_id, constrained_next_token, constrained_score))
-        #import pdb; pdb.set_trace()
+        print("Valid scores:\n{}".format("\n".join([str((vidx[i], vtokens[i], vscores[i])) for i in sorted_idx])))
+        import pdb; pdb.set_trace()
         return scores
 
     def greedy_search(
