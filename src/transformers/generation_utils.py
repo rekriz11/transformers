@@ -1981,8 +1981,8 @@ class GenerationMixin:
         real_score = scores[0][real_next_id].item()
         real_next_token = tokenizer.convert_ids_to_tokens(real_next_id)
         print("Real next id: {}, token: {}, real_score: {}".format(real_next_id, real_next_token, real_score))
-        rscores, ridx = torch.topk(scores, 10, dim=1, largest=True, sorted=True)
-        rscores, ridx = [s.item() for s in rscores[0]], [i.item() for i in rids[0]]
+        rscores, rids = torch.topk(scores, 10, dim=1, largest=True, sorted=True)
+        rscores, rids = [s.item() for s in rscores[0]], [i.item() for i in rids[0]]
         rtokens = tokenizer.convert_ids_to_tokens(rids)
         print("Original top 10:\n{}\n".format("\n".join([str((rids[i], rtokens[i], rscores[i])) for i in range(len(rscores))])))
         scores = self.mask_vocab(scores, beam_idx, valid_mask_list)
