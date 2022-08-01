@@ -1991,13 +1991,13 @@ class GenerationMixin:
             except AttributeError:
                 vidx.append(v[1])
                 vtokens.append(tokenizer.convert_ids_to_tokens(v[1]))
-            vscores.append(scores[v[0]][v[1]])
+            vscores.append(scores[v[0]][v[1]].item())
         sorted_idx = sorted(range(len(vscores)), key=lambda k: vscores[k], reverse=True)
         constrained_next_id = torch.argmax(scores, dim=-1).item()
         constrained_score = scores[0][constrained_next_id].item()
         constrained_next_token = tokenizer.convert_ids_to_tokens(constrained_next_id)
         print("Constrained next id: {}, token: {}, score: {}\n".format(constrained_next_id, constrained_next_token, constrained_score))
-        print("Valid scores:\n{}".format("\n".join([str((vidx[i], vtokens[i], vscores[i])) for i in sorted_idx])))
+        print("Valid scores:\n{}\n".format("\n".join([str((vidx[i], vtokens[i], vscores[i])) for i in sorted_idx])))
         import pdb; pdb.set_trace()
         return scores
 
