@@ -54,6 +54,7 @@ from .generation_stopping_criteria import (
 from .pytorch_utils import torch_int_div
 from .utils import ModelOutput, logging
 from itertools import groupby
+import math
 
 
 logger = logging.get_logger(__name__)
@@ -1844,11 +1845,26 @@ class GenerationMixin:
         #real_score = scores[0][real_next_id].item()
         #real_next_token = tokenizer.convert_ids_to_tokens(real_next_id)
         #print("Real next id: {}, token: {}, real_score: {}".format(real_next_id, real_next_token, real_score))
+        prev_ids = input_ids[0][input_length:].tolist()
+        prev_tokens = tokenizer.convert_ids_to_tokens(prev_ids)
+        print("Previous ids: {}\nprev_tokens: {}\n".format(prev_ids, prev_tokens))
+        real_next_id = torch.argmax(scores, dim=-1).item()
+        real_score = scores[0][real_next_id].item()
+        real_next_token = tokenizer.convert_ids_to_tokens(real_next_id)
+        print("Real next id: {}, token: {}, real_score: {}".format(real_next_id, real_next_token, real_score))
+        rscores, rids = torch.topk(scores, 10, dim=1, largest=True, sorted=True)
+        rscores, rids = [s.item() for s in rscores[0]], [i.item() for i in rids[0]]
+        rtokens = tokenizer.convert_ids_to_tokens(rids)
+        print("Original top 10:\n{}\n".format("\n".join([str((rids[i], rtokens[i], rscores[i])) for i in range(len(rscores))])))
         scores = self.mask_vocab(scores, beam_idx, valid_mask_list)
-        #constrained_next_id = torch.argmax(scores, dim=-1).item()
-        #constrained_score = scores[0][constrained_next_id].item()
-        #constrained_next_token = tokenizer.convert_ids_to_tokens(constrained_next_id)
-        #print("Constrained next id: {}, token: {}, score: {}".format(constrained_next_id, constrained_next_token, constrained_score))
+        constrained_next_id = torch.argmax(scores, dim=-1).item()
+        constrained_score = scores[0][constrained_next_id].item()
+        constrained_next_token = tokenizer.convert_ids_to_tokens(constrained_next_id)
+        print("Constrained next id: {}, token: {}, score: {}".format(constrained_next_id, constrained_next_token, constrained_score))
+        cscores, cids = torch.topk(scores, 5, dim=1, largest=True, sorted=True)
+        cscores, cids = [s.item() for s in cscores[0]], [i.item() for i in cids[0]]
+        ctokens = tokenizer.convert_ids_to_tokens(cids)
+        print("Constrained top 10:\n{}\n".format("\n".join([str((cids[i], ctokens[i], cscores[i])) for i in range(len(cscores)) if cscores[i] != -math.inf])))
         return scores
 
         ## Added constrained generation helper to only allow generation from valid candidates
@@ -1986,7 +2002,6 @@ class GenerationMixin:
         rtokens = tokenizer.convert_ids_to_tokens(rids)
         print("Original top 10:\n{}\n".format("\n".join([str((rids[i], rtokens[i], rscores[i])) for i in range(len(rscores))])))
         scores = self.mask_vocab(scores, beam_idx, valid_mask_list)
-        print("Valid_mask_list: {}".format(valid_mask_list))
         vidx, vtokens, vscores = [], [], []
         for v in valid_mask_list:
             try:
