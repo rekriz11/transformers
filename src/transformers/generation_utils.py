@@ -1865,6 +1865,7 @@ class GenerationMixin:
         cscores, cids = [s.item() for s in cscores[0]], [i.item() for i in cids[0]]
         ctokens = tokenizer.convert_ids_to_tokens(cids)
         print("Constrained top 10:\n{}\n".format("\n".join([str((cids[i], ctokens[i], cscores[i])) for i in range(len(cscores)) if cscores[i] != -math.inf])))
+        import pdb; pdb.set_trace()
         return scores
 
         ## Added constrained generation helper to only allow generation from valid candidates
