@@ -2202,7 +2202,7 @@ class GenerationMixin:
                 next_tokens_scores = self.set_scores_to_inf_for_invalid_questions(next_tokens_scores, input_ids, \
                     slot_constraints, empty_answer, delimiters, eos_token_id, input_length, tokenizer)
             elif constrained_type == 'template_input':
-                #print("\n#####STEP {}####".format(step))
+                print("\n#####STEP {}####".format(step))
                 next_tokens_scores = self.set_scores_to_inf_for_invalid_inputs(next_tokens_scores, input_ids, \
                     slot_constraints, valid_input, empty_answer, delimiters, eos_token_id, input_length, tokenizer)
             elif constrained_type == 'template_candidates':
