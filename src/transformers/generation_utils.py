@@ -1982,6 +1982,7 @@ class GenerationMixin:
         real_next_token = tokenizer.convert_ids_to_tokens(real_next_id)
         print("Real next id: {}, token: {}, real_score: {}".format(real_next_id, real_next_token, real_score))
         scores = self.mask_vocab(scores, beam_idx, valid_mask_list)
+        print("Valid_mask_list: {}".format(valid_mask_list))
         vidx, vtokens, vscores = [], [], []
         for v in valid_mask_list:
             try:
