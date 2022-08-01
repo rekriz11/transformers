@@ -1984,7 +1984,7 @@ class GenerationMixin:
         scores = self.mask_vocab(scores, beam_idx, valid_mask_list)
         print("Valid_mask_list: {}".format(valid_mask_list))
         vidx, vtokens, vscores = [], [], []
-        for v in valid_mask_list:
+        for v in valid_mask_list[0]:
             try:
                 vidx.append(v[1].item())
                 vtokens.append(tokenizer.convert_ids_to_tokens(v[1].item()))
