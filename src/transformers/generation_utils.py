@@ -884,6 +884,13 @@ class GenerationMixin:
         remove_invalid_values: Optional[bool] = None,
         synced_gpus: Optional[bool] = False,
         exponential_decay_length_penalty: Optional[Tuple[Union[int, float]]] = None,
+        constrained_type: Optional[str] = None,
+        slot_constraints: Optional[List[torch.tensor]] = None,
+        valid_input: Optional[torch.tensor] = None,
+        valid_candidates: Optional[List[torch.tensor]] = None,
+        empty_answer: Optional[torch.tensor] = None,
+        delimiters: Optional[List[int]] = None,
+        tokenizer: Optional = None,
         **model_kwargs,
     ) -> Union[GreedySearchOutput, SampleOutput, BeamSearchOutput, BeamSampleOutput, torch.LongTensor]:
         r"""
@@ -1300,6 +1307,12 @@ class GenerationMixin:
                 output_scores=output_scores,
                 return_dict_in_generate=return_dict_in_generate,
                 synced_gpus=synced_gpus,
+                constrained_type=constrained_type,
+                slot_constraints=slot_constraints,
+                valid_input=valid_input,
+                empty_answer=empty_answer,
+                delimiters=delimiters,
+                tokenizer=tokenizer,
                 **model_kwargs,
             )
 
@@ -1333,6 +1346,12 @@ class GenerationMixin:
                 output_scores=output_scores,
                 return_dict_in_generate=return_dict_in_generate,
                 synced_gpus=synced_gpus,
+                constrained_type=constrained_type,
+                slot_constraints=slot_constraints,
+                valid_input=valid_input,
+                empty_answer=empty_answer,
+                delimiters=delimiters,
+                tokenizer=tokenizer,
                 **model_kwargs,
             )
 
@@ -1367,6 +1386,12 @@ class GenerationMixin:
                 output_scores=output_scores,
                 return_dict_in_generate=return_dict_in_generate,
                 synced_gpus=synced_gpus,
+                constrained_type=constrained_type,
+                slot_constraints=slot_constraints,
+                valid_input=valid_input,
+                empty_answer=empty_answer,
+                delimiters=delimiters,
+                tokenizer=tokenizer,
                 **model_kwargs,
             )
 
@@ -1412,6 +1437,12 @@ class GenerationMixin:
                 output_scores=output_scores,
                 return_dict_in_generate=return_dict_in_generate,
                 synced_gpus=synced_gpus,
+                constrained_type=constrained_type,
+                slot_constraints=slot_constraints,
+                valid_input=valid_input,
+                empty_answer=empty_answer,
+                delimiters=delimiters,
+                tokenizer=tokenizer,
                 **model_kwargs,
             )
 
@@ -1851,6 +1882,13 @@ class GenerationMixin:
         output_scores: Optional[bool] = None,
         return_dict_in_generate: Optional[bool] = None,
         synced_gpus: Optional[bool] = False,
+        constrained_type: Optional[str] = None,
+        slot_constraints: Optional[List[torch.tensor]] = None,
+        valid_input: Optional[torch.tensor] = None,
+        valid_candidates: Optional[List[torch.tensor]] = None,
+        empty_answer: Optional[torch.tensor] = None,
+        delimiters: Optional[List[int]] = None,
+        tokenizer: Optional = None,
         **model_kwargs,
     ) -> Union[GreedySearchOutput, torch.LongTensor]:
         r"""
@@ -2004,6 +2042,8 @@ class GenerationMixin:
 
             # pre-process distribution
             next_tokens_scores = logits_processor(input_ids, next_token_logits)
+            if constrained_type == 'entity_input':
+                next_tokens_scores = self.set_scores_to_inf_for_invalid_inputs(next_tokens_scores, input_ids, disjoint_entities, context, empty_answer, delimiters, eos_token_id, tokenizer)
 
             # Store scores, attentions and hidden_states when required
             if return_dict_in_generate:
@@ -2085,6 +2125,13 @@ class GenerationMixin:
         output_scores: Optional[bool] = None,
         return_dict_in_generate: Optional[bool] = None,
         synced_gpus: Optional[bool] = False,
+        constrained_type: Optional[str] = None,
+        slot_constraints: Optional[List[torch.tensor]] = None,
+        valid_input: Optional[torch.tensor] = None,
+        valid_candidates: Optional[List[torch.tensor]] = None,
+        empty_answer: Optional[torch.tensor] = None,
+        delimiters: Optional[List[int]] = None,
+        tokenizer: Optional = None,
         **model_kwargs,
     ) -> Union[SampleOutput, torch.LongTensor]:
         r"""
@@ -2342,6 +2389,13 @@ class GenerationMixin:
         output_scores: Optional[bool] = None,
         return_dict_in_generate: Optional[bool] = None,
         synced_gpus: Optional[bool] = False,
+        constrained_type: Optional[str] = None,
+        slot_constraints: Optional[List[torch.tensor]] = None,
+        valid_input: Optional[torch.tensor] = None,
+        valid_candidates: Optional[List[torch.tensor]] = None,
+        empty_answer: Optional[torch.tensor] = None,
+        delimiters: Optional[List[int]] = None,
+        tokenizer: Optional = None,
         **model_kwargs,
     ) -> Union[BeamSearchOutput, torch.LongTensor]:
         r"""
@@ -2651,6 +2705,13 @@ class GenerationMixin:
         output_scores: Optional[bool] = None,
         return_dict_in_generate: Optional[bool] = None,
         synced_gpus: Optional[bool] = False,
+        constrained_type: Optional[str] = None,
+        slot_constraints: Optional[List[torch.tensor]] = None,
+        valid_input: Optional[torch.tensor] = None,
+        valid_candidates: Optional[List[torch.tensor]] = None,
+        empty_answer: Optional[torch.tensor] = None,
+        delimiters: Optional[List[int]] = None,
+        tokenizer: Optional = None,
         **model_kwargs,
     ) -> Union[BeamSampleOutput, torch.LongTensor]:
         r"""
