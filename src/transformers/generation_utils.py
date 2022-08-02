@@ -1535,6 +1535,21 @@ class GenerationMixin:
                 **model_kwargs,
             )
 
+    ## Added constrained generation helper to mask all but a valid list of subwords
+    def mask_vocab(self, scores, beam_idx, valid_mask_list):
+        ## If there are no valid candidates, throw an error
+        if valid_mask_list == []:
+            scores[beam_idx] = -float("inf")
+            #print("No valid candidates!")
+        else:
+            valid_mask = torch.LongTensor(valid_mask_list)
+            indices = torch.ones(len(valid_mask))
+            ## Avoids masking all valid tokens, masks all others
+            valid_mask = ~(torch.sparse.LongTensor(valid_mask.t(), \
+                indices, scores.size()).to(scores.device).to_dense().bool())
+            scores[beam_idx] = scores[beam_idx].masked_fill(valid_mask[beam_idx], -float("inf"))
+        return scores
+
     ## Added constrained generation helper to only allow generation of valid entity types/strings from input text
     def set_scores_to_inf_for_invalid_candidates(self, scores, tokens, disjoint_entities, input, delimiters, constraint_type):
         force_entity, cur_entities = [0 for i in range(scores.shape[0])], [[] for i in range(scores.shape[0])]
