@@ -1535,6 +1535,127 @@ class GenerationMixin:
                 **model_kwargs,
             )
 
+    ## Added constrained generation helper to only allow generation of valid entity types/strings from input text
+    def set_scores_to_inf_for_invalid_candidates(self, scores, tokens, disjoint_entities, input, delimiters, constraint_type):
+        force_entity, cur_entities = [0 for i in range(scores.shape[0])], [[] for i in range(scores.shape[0])]
+        force_input, cur_input = [0 for i in range(scores.shape[0])], [[] for i in range(scores.shape[0])]
+        ## token signifying an empty slot is passed in as the 3rd slot delimiter
+        empty_answer = delimiters[0][1].item()
+        for beam_idx in range(scores.shape[0]):
+            cur_tokens = tokens[beam_idx].tolist()
+            ## If the most recently generated token is 2 or we've generated 2 EOS tokens, skip over everything
+            if len(cur_tokens) > 1 and (cur_tokens[-1] == 2 or tokens[beam_idx].tolist().count(self.eos) >= 2):
+                continue
+            cur_tokens.reverse()
+
+            ## Check for major delimiter
+            try:
+                major_delim_index = cur_tokens.index(delimiters[0][0])
+            except ValueError:
+                #print("Major delimiter {} not found in candidate {}".format(slot_delimiters[0][0].item(), tokens[beam_idx]))
+                ## If major delimiter not generated yet, check if an entity type has been generated
+                #print("")
+                for d in disjoint_entities[0]:
+                    #print("tokens[beam_idx][:len(d)]: {}, d: {}".format(tokens[beam_idx][1:len(d)+1], d))
+                    ## If an entity type has been fully generated, marked this as forced from input
+                    if tokens[beam_idx][1:len(d)+1].tolist() == d.tolist():
+                        force_input[beam_idx] = 1
+                        cur_input[beam_idx] = tokens[beam_idx].tolist()[len(d)+1:]
+                        break
+                if force_input[beam_idx] == 0:
+                    force_entity[beam_idx] = 1
+                    cur_entities[beam_idx] = tokens[beam_idx].tolist()[1:]
+                continue
+
+            ## To track the current entity being generated, split current tokens by major delimiter
+            entity_idx = tokens[beam_idx].tolist().count(delimiters[0][0].item()) + 1
+            cur_cand = cur_tokens[:major_delim_index]
+            cur_cand.reverse()
+            for d in disjoint_entities[0]:
+                if cur_cand[:len(d)] == d.tolist():
+                    force_input[beam_idx] = entity_idx
+                    cur_input[beam_idx] = cur_cand[len(d):]
+                    break
+            if force_input[beam_idx] == 0:
+                force_entity[beam_idx] = entity_idx
+                cur_entities[beam_idx] = cur_cand
+
+        #print("\n\ntokens: {}\nforce_entity: {}\ncur_entities: {}\nforce_input: {}\ncur_input: {}\ndelimiters: {}\nempty answer: {}\n".format(tokens, force_entity, \
+        #    cur_entities, force_input, cur_input, delimiters, empty_answer))
+        #print("self.eos: {}".format(self.eos))
+        #print("\n")
+        for beam_idx, (cur_ent, cur_inp) in enumerate(zip(cur_entities, cur_input)):
+            ## If EOS has appeared twice, stop masking
+            if len(cur_tokens) > 1 and tokens[beam_idx].tolist().count(self.eos) >= 2:
+                #print("No more masking needed for idx {}, scores: {}".format(beam_idx, scores[beam_idx]))
+                continue
+            valid_mask_list = []
+            if force_entity[beam_idx]:
+                cur_valid_entities = [v.tolist() for v in disjoint_entities[0]]
+                #print("\ncur_valid_entities: {}".format(cur_valid_entities))
+                ## If no entity type has been generated yet, allow the first subword of all candidates
+                if not cur_ent:
+                    valid_mask_list = [[beam_idx, v2] for v2 in list(set([v[0] for v in cur_valid_entities]))]
+                    ## If it's the first entity type, also allow the empty subword
+                    if force_entity[beam_idx] == 1:
+                        valid_mask_list.append([beam_idx, empty_answer])
+                else:
+                    ## If the empty answer (NULL) was generated, the only valid next subword is EOS
+                    #print("cur_ent == [empty_answer]: {}".format(cur_ent == [empty_answer]))
+                    if cur_ent == [empty_answer]:
+                        valid_mask_list = [[beam_idx, 2]]
+                    else:
+                        ## Need to find all candidates that start with what has been generated so far and are longer than what's been generated
+                        valid_entities_step = [v for v in cur_valid_entities if cur_ent == v[:len(cur_ent)]]
+                        #print("valid_entities_step: {}".format(valid_entities_step))
+                        unfinished = [v for v in valid_entities_step if len(v) > len(cur_ent)]
+                        valid_mask_list = [[beam_idx, v2] for v2 in list(set([v[len(cur_ent)] for v in unfinished]))]
+                        ## If there are finished candidates, or there are no valid candidates,
+                        ## add minor delimiter as valid subword
+                        finished = [v for v in valid_entities_step if len(v) == len(cur_ent)]
+                        if finished != []:
+                            #print("Finished candidates: {}, number of forced candidates generated so far: {}".format(finished, forced_cands[beam_idx]))
+                            valid_mask_list.append([beam_idx, delimiters[0][0].item()])
+                #print("FORCED ENTITY for idx {}, cur_ent: {}, valid_mask_list: {}".format(beam_idx, cur_ent, valid_mask_list))
+            elif force_input[beam_idx]:
+                ## If no partial answer has been generated yet, all input subwords are valid
+                if not cur_inp:
+                    valid_mask_list = [[beam_idx, v2] for v2 in list(set(input[0].tolist()))]
+                else:
+                    ## If something has been generated, the major delimiter and EOS are always valid next steps
+                    valid_mask_list = [[beam_idx, delimiters[0][0].item()], [beam_idx, 2]]
+                    ## Iterate through input text to find all instances of the answer that has been generated so far,
+                    ## the next subword following each instance is a valid next step
+                    for idx in range(len(input[0])-len(cur_inp)):
+                        if input[0][idx:idx+len(cur_inp)].tolist() == cur_inp:
+                            valid_mask_list.append([beam_idx, input[0][idx+len(cur_inp)].item()])
+                #print("FORCED INPUT for idx {}, cur_inp: {}, valid_mask_list: {}".format(beam_idx, cur_inp, valid_mask_list))
+            else:
+                ## This signifies we generated 2, if we're sampling then always allow EOS
+                if 'sampling' in constraint_type:
+                    valid_mask_list = [[beam_idx, self.eos]]
+                    #print("END OF SEQUENCE for idx {}, tokens: {}, valid_mask_list: {}".format(beam_idx, tokens[beam_idx], valid_mask_list))
+                ## Otherwise, if we're using beam search check if the same output is found higher in the beam
+                else:
+                    if beam_idx == 0:
+                        valid_mask_list = [[beam_idx, self.eos]]
+                        #print("END OF SEQUENCE found, top candidate...\ntokens: {}, valid_mask_list: {}".format(tokens[beam_idx], valid_mask_list))
+                    else:
+                        found_higher = False
+                        for idx in range(beam_idx):
+                            if tokens[idx][:-1].tolist() == tokens[beam_idx][:-1].tolist():
+                                found_higher = True
+                                break
+                        if found_higher:
+                            valid_mask_list = []
+                            #print("END OF SEQUENCE found, not top candidate and found higher\ntokens: {}, valid_mask_list: {}".format(tokens[beam_idx], valid_mask_list))
+                        else:
+                            valid_mask_list = [[beam_idx, self.eos]]
+                            #print("END OF SEQUENCE found, not top candidate but not found higher...\ntokens: {}, valid_mask_list: {}".format(tokens[beam_idx], valid_mask_list))
+            scores = self.mask_vocab(scores, beam_idx, valid_mask_list)
+            #print("scores: {}".format([scores[v[0]][v[1]] for v in valid_mask_list]))
+        return scores
+
     def greedy_search(
         self,
         input_ids: torch.LongTensor,
