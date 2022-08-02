@@ -2042,7 +2042,8 @@ class GenerationMixin:
             # pre-process distribution
             next_tokens_scores = logits_processor(input_ids, next_token_logits)
             if constrained_type == 'entity_input':
-                next_tokens_scores = self.set_scores_to_inf_for_invalid_inputs(next_tokens_scores, input_ids, disjoint_entities, context, empty_answer, delimiters, eos_token_id, tokenizer)
+                next_tokens_scores = self.set_scores_to_inf_for_invalid_inputs(next_tokens_scores, input_ids, disjoint_entities, \
+                    valid_input, empty_answer, delimiters, eos_token_id, tokenizer)
 
             # Store scores, attentions and hidden_states when required
             if return_dict_in_generate:
