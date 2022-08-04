@@ -53,6 +53,7 @@ from .generation_stopping_criteria import (
 )
 from .pytorch_utils import torch_int_div
 from .utils import ModelOutput, logging
+import math
 
 
 logger = logging.get_logger(__name__)
