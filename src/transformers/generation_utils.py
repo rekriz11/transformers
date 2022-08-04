@@ -1613,8 +1613,7 @@ class GenerationMixin:
             cur_cand = cur_tokens[:entity_delim_index]
             cur_tokens.reverse()
             cur_cand.reverse()
-            for d in disjoint_entities[0]:
-                import pdb; pdb.set_trace()
+            for d in disjoint_entities:
                 if cur_cand[:len(d)] == d:
                     force_input[beam_idx] = entity_idx
                     cur_input[beam_idx] = cur_cand[len(d):]
