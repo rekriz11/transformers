@@ -1691,7 +1691,7 @@ class GenerationMixin:
                             valid_mask_list = [[beam_idx, eos_token_id]]
                             #print("END OF SEQUENCE found, not top candidate but not found higher...\ntokens: {}, valid_mask_list: {}".format(tokens[beam_idx], valid_mask_list))
         #if force_input[0]:
-        prev_ids = input_ids[0][input_length:].tolist()
+        prev_ids = input_ids[0].tolist()
         prev_tokens = tokenizer.convert_ids_to_tokens(prev_ids)
         print("Previous ids: {}\nprev_tokens: {}\n".format(prev_ids, prev_tokens))
         real_next_id = torch.argmax(scores, dim=-1).item()
