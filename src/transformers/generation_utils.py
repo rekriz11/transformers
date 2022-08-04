@@ -1586,10 +1586,9 @@ class GenerationMixin:
         [entity_delim, entity_type_delim] = delimiters
         force_entity, cur_entities = [0 for i in range(scores.shape[0])], [[] for i in range(scores.shape[0])]
         force_input, cur_input = [0 for i in range(scores.shape[0])], [[] for i in range(scores.shape[0])]
-        import pdb; pdb.set_trace()
         for beam_idx in range(scores.shape[0]):
-            cur_tokens = tokens[beam_idx].tolist()
-            if len(cur_tokens) > 1 and (cur_tokens[-1] == eos_token_id or tokens[beam_idx].tolist().count(self.eos) >= 2):
+            cur_tokens = input_ids[beam_idx].tolist()
+            if len(cur_tokens) > 1 and (cur_tokens[-1] == eos_token_id or cur_tokens.count(self.eos) >= 2):
                 continue
             ## Check for delimiter splitting entities
             try:
