@@ -1589,7 +1589,7 @@ class GenerationMixin:
         force_input, cur_input = [0 for i in range(scores.shape[0])], [[] for i in range(scores.shape[0])]
         for beam_idx in range(scores.shape[0]):
             cur_tokens = input_ids[beam_idx].tolist()
-            if len(cur_tokens) > 1 and (cur_tokens[-1] == eos_token_id or cur_tokens.count(self.eos) >= 2):
+            if len(cur_tokens) > 1 and (cur_tokens[-1] == eos_token_id or cur_tokens.count(eos_token_id) >= 2):
                 continue
             ## Check for delimiter splitting entities
             try:
