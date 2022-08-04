@@ -1715,7 +1715,6 @@ class GenerationMixin:
         import pdb; pdb.set_trace()
         #else:
         #    scores = self.mask_vocab(scores, beam_idx, valid_mask_list)
-        import pdb; pdb.set_trace()
         return scores
 
     '''
