@@ -1612,7 +1612,7 @@ class GenerationMixin:
                 continue
             ## To track the current entity being generated, split current tokens by major delimiter
             entity_idx = cur_tokens.count(entity_delim) + 1
-            cur_cand = cur_tokens[entity_delim_index]
+            cur_cand = cur_tokens[entity_delim_index:]
             for d in disjoint_entities:
                 if cur_cand[:len(d)] == d:
                     force_input[beam_idx] = entity_idx
