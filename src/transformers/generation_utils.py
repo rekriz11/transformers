@@ -1633,6 +1633,7 @@ class GenerationMixin:
                 #print("\ncur_valid_entities: {}".format(cur_valid_entities))
                 ## If no entity type has been generated yet, allow the first subword of all candidates
                 if not cur_ent:
+                    import pdb; pdb.set_trace()
                     valid_mask_list = [[beam_idx, v2] for v2 in list(set([v[0] for v in cur_valid_entities]))]
                     ## If it's the first entity type, also allow the empty subword
                     if force_entity[beam_idx] == 1:
