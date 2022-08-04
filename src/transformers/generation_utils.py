@@ -1712,7 +1712,7 @@ class GenerationMixin:
         cscores, cids = [s.item() for s in cscores[0]], [i.item() for i in cids[0]]
         ctokens = tokenizer.convert_ids_to_tokens(cids)
         print("Constrained top 10:\n{}\n".format("\n".join([str((cids[i], ctokens[i], cscores[i])) for i in range(len(cscores)) if cscores[i] != -math.inf])))
-        import pdb; pdb.set_trace()
+        #import pdb; pdb.set_trace()
         #else:
         #    scores = self.mask_vocab(scores, beam_idx, valid_mask_list)
         return scores
@@ -2059,6 +2059,7 @@ class GenerationMixin:
             # pre-process distribution
             next_tokens_scores = logits_processor(input_ids, next_token_logits)
             if constrained_type == 'entity_input':
+                print("\n##### STEP {} #####".format(cur_len))
                 next_tokens_scores = self.set_scores_to_inf_for_invalid_inputs(next_tokens_scores, input_ids, disjoint_entities, \
                     valid_input, empty_answer, delimiters, eos_token_id, tokenizer)
 
