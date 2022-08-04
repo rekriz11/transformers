@@ -1666,8 +1666,8 @@ class GenerationMixin:
                     ## Iterate through input text to find all instances of the answer that has been generated so far,
                     ## the next subword following each instance is a valid next step
                     for idx in range(len(context)-len(cur_inp)):
-                        if context[idx:idx+len(cur_inp)].tolist() == cur_inp:
-                            valid_mask_list.append([beam_idx, context[idx+len(cur_inp)].item()])
+                        if context[idx:idx+len(cur_inp)] == cur_inp:
+                            valid_mask_list.append([beam_idx, context[idx+len(cur_inp)]])
                 #print("FORCED INPUT for idx {}, cur_inp: {}, valid_mask_list: {}".format(beam_idx, cur_inp, valid_mask_list))
             else:
                 ## This signifies we generated 2, if we're sampling then always allow EOS
