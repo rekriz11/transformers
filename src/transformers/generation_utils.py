@@ -1629,7 +1629,7 @@ class GenerationMixin:
                 continue
             valid_mask_list = []
             if force_entity[beam_idx]:
-                cur_valid_entities = disjoint_entities[0]
+                cur_valid_entities = list(disjoint_entities)
                 #print("\ncur_valid_entities: {}".format(cur_valid_entities))
                 ## If no entity type has been generated yet, allow the first subword of all candidates
                 if not cur_ent:
