@@ -1659,15 +1659,15 @@ class GenerationMixin:
             elif force_input[beam_idx]:
                 ## If no partial answer has been generated yet, all input subwords are valid
                 if not cur_inp:
-                    valid_mask_list = [[beam_idx, v2] for v2 in list(set(input[0].tolist()))]
+                    valid_mask_list = [[beam_idx, v2] for v2 in list(set(context))]
                 else:
                     ## If something has been generated, the major delimiter and EOS are always valid next steps
                     valid_mask_list = [[beam_idx, delimiters[0][0].item()], [beam_idx, 2]]
                     ## Iterate through input text to find all instances of the answer that has been generated so far,
                     ## the next subword following each instance is a valid next step
-                    for idx in range(len(input[0])-len(cur_inp)):
-                        if input[0][idx:idx+len(cur_inp)].tolist() == cur_inp:
-                            valid_mask_list.append([beam_idx, input[0][idx+len(cur_inp)].item()])
+                    for idx in range(len(context)-len(cur_inp)):
+                        if context[idx:idx+len(cur_inp)].tolist() == cur_inp:
+                            valid_mask_list.append([beam_idx, context[idx+len(cur_inp)].item()])
                 #print("FORCED INPUT for idx {}, cur_inp: {}, valid_mask_list: {}".format(beam_idx, cur_inp, valid_mask_list))
             else:
                 ## This signifies we generated 2, if we're sampling then always allow EOS
