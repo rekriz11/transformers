@@ -1595,7 +1595,6 @@ class GenerationMixin:
             try:
                 cur_tokens.reverse()
                 entity_delim_index = cur_tokens.index(entity_delim)
-                cur_tokens.reverse()
             except ValueError:
                 cur_tokens.reverse()
                 ## If major delimiter not generated yet, check if an entity type has been generated
@@ -1612,7 +1611,8 @@ class GenerationMixin:
                 continue
             ## To track the current entity being generated, split current tokens by major delimiter
             entity_idx = cur_tokens.count(entity_delim) + 1
-            cur_cand = cur_tokens[entity_delim_index:]
+            cur_cand = cur_tokens[:entity_delim_index]
+            cur_cand.reverse()
             for d in disjoint_entities:
                 if cur_cand[:len(d)] == d:
                     force_input[beam_idx] = entity_idx
