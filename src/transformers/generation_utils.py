@@ -1608,7 +1608,7 @@ class GenerationMixin:
                     cur_entities[beam_idx] = cur_tokens[1:]
                 continue
             ## To track the current entity being generated, split current tokens by major delimiter
-            entity_idx = cur_tokens.count(delimiters[0][0].item()) + 1
+            entity_idx = cur_tokens.count(entity_delim) + 1
             cur_tokens.reverse()
             cur_cand = cur_tokens[:major_delim_index]
             cur_tokens.reverse()
@@ -1654,7 +1654,7 @@ class GenerationMixin:
                         finished = [v for v in valid_entities_step if len(v) == len(cur_ent)]
                         if finished != []:
                             #print("Finished candidates: {}, number of forced candidates generated so far: {}".format(finished, forced_cands[beam_idx]))
-                            valid_mask_list.append([beam_idx, delimiters[0][0].item()])
+                            valid_mask_list.append([beam_idx, entity_delim])
                 #print("FORCED ENTITY for idx {}, cur_ent: {}, valid_mask_list: {}".format(beam_idx, cur_ent, valid_mask_list))
             elif force_input[beam_idx]:
                 ## If no partial answer has been generated yet, all input subwords are valid
@@ -1662,7 +1662,7 @@ class GenerationMixin:
                     valid_mask_list = [[beam_idx, v2] for v2 in list(set(context))]
                 else:
                     ## If something has been generated, the major delimiter and EOS are always valid next steps
-                    valid_mask_list = [[beam_idx, delimiters[0][0].item()], [beam_idx, 2]]
+                    valid_mask_list = [[beam_idx, entity_delim], [beam_idx, eos_token_id]]
                     ## Iterate through input text to find all instances of the answer that has been generated so far,
                     ## the next subword following each instance is a valid next step
                     for idx in range(len(context)-len(cur_inp)):
