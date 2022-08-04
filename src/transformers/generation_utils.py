@@ -1621,6 +1621,7 @@ class GenerationMixin:
             if force_input[beam_idx] == 0:
                 force_entity[beam_idx] = entity_idx
                 cur_entities[beam_idx] = cur_cand
+            import pdb; pdb.set_trace()
         print("\n\ninput_ids: {}\nforce_entity: {}\ncur_entities: {}\nforce_input: {}\ncur_input: {}\ndelimiters: {}\nempty answer: {}\n".format(input_ids, force_entity, \
             cur_entities, force_input, cur_input, delimiters, empty_answer))
         for beam_idx, (cur_ent, cur_inp) in enumerate(zip(cur_entities, cur_input)):
