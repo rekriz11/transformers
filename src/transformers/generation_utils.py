@@ -1589,11 +1589,8 @@ class GenerationMixin:
         import pdb; pdb.set_trace()
         for beam_idx in range(scores.shape[0]):
             cur_tokens = tokens[beam_idx].tolist()
-            ## If the most recently generated token is 2 or we've generated 2 EOS tokens, skip over everything
-            if len(cur_tokens) > 1 and (cur_tokens[-1] == 2 or tokens[beam_idx].tolist().count(self.eos) >= 2):
+            if len(cur_tokens) > 1 and (cur_tokens[-1] == eos_token_id or tokens[beam_idx].tolist().count(self.eos) >= 2):
                 continue
-            cur_tokens.reverse()
-
             ## Check for delimiter splitting entities
             try:
                 entity_delim_index = cur_tokens.index(entity_delim)
@@ -1602,18 +1599,19 @@ class GenerationMixin:
                 for d in disjoint_entities:
                     #print("tokens[beam_idx][:len(d)]: {}, d: {}".format(tokens[beam_idx][1:len(d)+1], d))
                     ## If an entity type has been fully generated, marked this as forced from input
-                    if tokens[beam_idx][1:len(d)+1].tolist() == d.tolist():
+                    if cur_tokens[1:len(d)+1] == d:
                         force_input[beam_idx] = 1
-                        cur_input[beam_idx] = tokens[beam_idx].tolist()[len(d)+1:]
+                        cur_input[beam_idx] = cur_tokens[len(d)+1:]
                         break
                 if force_input[beam_idx] == 0:
                     force_entity[beam_idx] = 1
-                    cur_entities[beam_idx] = tokens[beam_idx].tolist()[1:]
+                    cur_entities[beam_idx] = cur_tokens[1:]
                 continue
-
             ## To track the current entity being generated, split current tokens by major delimiter
-            entity_idx = tokens[beam_idx].tolist().count(delimiters[0][0].item()) + 1
+            entity_idx = cur_tokens.count(delimiters[0][0].item()) + 1
+            cur_tokens.reverse()
             cur_cand = cur_tokens[:major_delim_index]
+            cur_tokens.reverse()
             cur_cand.reverse()
             for d in disjoint_entities[0]:
                 if cur_cand[:len(d)] == d.tolist():
@@ -1623,19 +1621,16 @@ class GenerationMixin:
             if force_input[beam_idx] == 0:
                 force_entity[beam_idx] = entity_idx
                 cur_entities[beam_idx] = cur_cand
-
-        #print("\n\ntokens: {}\nforce_entity: {}\ncur_entities: {}\nforce_input: {}\ncur_input: {}\ndelimiters: {}\nempty answer: {}\n".format(tokens, force_entity, \
-        #    cur_entities, force_input, cur_input, delimiters, empty_answer))
-        #print("self.eos: {}".format(self.eos))
-        #print("\n")
+        print("\n\ntokens: {}\nforce_entity: {}\ncur_entities: {}\nforce_input: {}\ncur_input: {}\ndelimiters: {}\nempty answer: {}\n".format(tokens, force_entity, \
+            cur_entities, force_input, cur_input, delimiters, empty_answer))
         for beam_idx, (cur_ent, cur_inp) in enumerate(zip(cur_entities, cur_input)):
             ## If EOS has appeared twice, stop masking
-            if len(cur_tokens) > 1 and tokens[beam_idx].tolist().count(self.eos) >= 2:
+            if len(cur_tokens) > 1 and cur_tokens.count(eos_token_id) >= 2:
                 #print("No more masking needed for idx {}, scores: {}".format(beam_idx, scores[beam_idx]))
                 continue
             valid_mask_list = []
             if force_entity[beam_idx]:
-                cur_valid_entities = [v.tolist() for v in disjoint_entities[0]]
+                cur_valid_entities = disjoint_entities[0]
                 #print("\ncur_valid_entities: {}".format(cur_valid_entities))
                 ## If no entity type has been generated yet, allow the first subword of all candidates
                 if not cur_ent:
@@ -1647,7 +1642,7 @@ class GenerationMixin:
                     ## If the empty answer (NULL) was generated, the only valid next subword is EOS
                     #print("cur_ent == [empty_answer]: {}".format(cur_ent == [empty_answer]))
                     if cur_ent == [empty_answer]:
-                        valid_mask_list = [[beam_idx, 2]]
+                        valid_mask_list = [[beam_idx, eos_token_id]]
                     else:
                         ## Need to find all candidates that start with what has been generated so far and are longer than what's been generated
                         valid_entities_step = [v for v in cur_valid_entities if cur_ent == v[:len(cur_ent)]]
@@ -1677,12 +1672,12 @@ class GenerationMixin:
             else:
                 ## This signifies we generated 2, if we're sampling then always allow EOS
                 if 'sampling' in constraint_type:
-                    valid_mask_list = [[beam_idx, self.eos]]
+                    valid_mask_list = [[beam_idx, eos_token_id]]
                     #print("END OF SEQUENCE for idx {}, tokens: {}, valid_mask_list: {}".format(beam_idx, tokens[beam_idx], valid_mask_list))
                 ## Otherwise, if we're using beam search check if the same output is found higher in the beam
                 else:
                     if beam_idx == 0:
-                        valid_mask_list = [[beam_idx, self.eos]]
+                        valid_mask_list = [[beam_idx, eos_token_id]]
                         #print("END OF SEQUENCE found, top candidate...\ntokens: {}, valid_mask_list: {}".format(tokens[beam_idx], valid_mask_list))
                     else:
                         found_higher = False
@@ -1694,10 +1689,33 @@ class GenerationMixin:
                             valid_mask_list = []
                             #print("END OF SEQUENCE found, not top candidate and found higher\ntokens: {}, valid_mask_list: {}".format(tokens[beam_idx], valid_mask_list))
                         else:
-                            valid_mask_list = [[beam_idx, self.eos]]
+                            valid_mask_list = [[beam_idx, eos_token_id]]
                             #print("END OF SEQUENCE found, not top candidate but not found higher...\ntokens: {}, valid_mask_list: {}".format(tokens[beam_idx], valid_mask_list))
+        if force_input[0]:
+            prev_ids = input_ids[0][input_length:].tolist()
+            prev_tokens = tokenizer.convert_ids_to_tokens(prev_ids)
+            print("Previous ids: {}\nprev_tokens: {}\n".format(prev_ids, prev_tokens))
+            real_next_id = torch.argmax(scores, dim=-1).item()
+            real_score = scores[0][real_next_id].item()
+            real_next_token = tokenizer.convert_ids_to_tokens(real_next_id)
+            print("Real next id: {}, token: {}, real_score: {}".format(real_next_id, real_next_token, real_score))
+            rscores, rids = torch.topk(scores, 10, dim=1, largest=True, sorted=True)
+            rscores, rids = [s.item() for s in rscores[0]], [i.item() for i in rids[0]]
+            rtokens = tokenizer.convert_ids_to_tokens(rids)
+            print("Original top 10:\n{}\n".format("\n".join([str((rids[i], rtokens[i], rscores[i])) for i in range(len(rscores))])))
             scores = self.mask_vocab(scores, beam_idx, valid_mask_list)
-            #print("scores: {}".format([scores[v[0]][v[1]] for v in valid_mask_list]))
+            constrained_next_id = torch.argmax(scores, dim=-1).item()
+            constrained_score = scores[0][constrained_next_id].item()
+            constrained_next_token = tokenizer.convert_ids_to_tokens(constrained_next_id)
+            print("Constrained next id: {}, token: {}, score: {}".format(constrained_next_id, constrained_next_token, constrained_score))
+            cscores, cids = torch.topk(scores, 5, dim=1, largest=True, sorted=True)
+            cscores, cids = [s.item() for s in cscores[0]], [i.item() for i in cids[0]]
+            ctokens = tokenizer.convert_ids_to_tokens(cids)
+            print("Constrained top 10:\n{}\n".format("\n".join([str((cids[i], ctokens[i], cscores[i])) for i in range(len(cscores)) if cscores[i] != -math.inf])))
+            import pdb; pdb.set_trace()
+        else:
+            scores = self.mask_vocab(scores, beam_idx, valid_mask_list)
+        import pdb; pdb.set_trace()
         return scores
 
     '''
