@@ -1838,13 +1838,14 @@ class GenerationMixin:
                         import pdb; pdb.set_trace()
             else:
                 valid_mask_list.append([beam_idx, eos_token_id])
-        #prev_ids = input_ids[0][input_length:].tolist()
-        #prev_tokens = tokenizer.convert_ids_to_tokens(prev_ids)
-        #print("Previous ids: {}\nprev_tokens: {}\n".format(prev_ids, prev_tokens))
-        #real_next_id = torch.argmax(scores, dim=-1).item()
-        #real_score = scores[0][real_next_id].item()
-        #real_next_token = tokenizer.convert_ids_to_tokens(real_next_id)
-        #print("Real next id: {}, token: {}, real_score: {}".format(real_next_id, real_next_token, real_score))
+        '''
+        prev_ids = input_ids[0][input_length:].tolist()
+        prev_tokens = tokenizer.convert_ids_to_tokens(prev_ids)
+        print("Previous ids: {}\nprev_tokens: {}\n".format(prev_ids, prev_tokens))
+        real_next_id = torch.argmax(scores, dim=-1).item()
+        real_score = scores[0][real_next_id].item()
+        real_next_token = tokenizer.convert_ids_to_tokens(real_next_id)
+        print("Real next id: {}, token: {}, real_score: {}".format(real_next_id, real_next_token, real_score))
         if forced_answer[0]:
             prev_ids = input_ids[0][input_length:].tolist()
             prev_tokens = tokenizer.convert_ids_to_tokens(prev_ids)
@@ -1868,7 +1869,8 @@ class GenerationMixin:
             print("Constrained top 10:\n{}\n".format("\n".join([str((cids[i], ctokens[i], cscores[i])) for i in range(len(cscores)) if cscores[i] != -math.inf])))
             import pdb; pdb.set_trace()
         else:
-            scores = self.mask_vocab(scores, beam_idx, valid_mask_list)
+        '''
+        scores = self.mask_vocab(scores, beam_idx, valid_mask_list)
         return scores
 
     ## Added constrained generation helper to only allow generation from valid candidates
@@ -1994,38 +1996,37 @@ class GenerationMixin:
                         import pdb; pdb.set_trace()
             else:
                 valid_mask_list.append([beam_idx, eos_token_id])
-
-        if forced_answer[0]:
-            prev_ids = input_ids[0][input_length:].tolist()
-            prev_tokens = tokenizer.convert_ids_to_tokens(prev_ids)
-            print("Previous ids: {}\nprev_tokens: {}\n".format(prev_ids, prev_tokens))
-            real_next_id = torch.argmax(scores, dim=-1).item()
-            real_score = scores[0][real_next_id].item()
-            real_next_token = tokenizer.convert_ids_to_tokens(real_next_id)
-            print("Real next id: {}, token: {}, real_score: {}".format(real_next_id, real_next_token, real_score))
-            rscores, rids = torch.topk(scores, 10, dim=1, largest=True, sorted=True)
-            rscores, rids = [s.item() for s in rscores[0]], [i.item() for i in rids[0]]
-            rtokens = tokenizer.convert_ids_to_tokens(rids)
-            print("Original top 10:\n{}\n".format("\n".join([str((rids[i], rtokens[i], rscores[i])) for i in range(len(rscores))])))
-            scores = self.mask_vocab(scores, beam_idx, valid_mask_list)
-            vidx, vtokens, vscores = [], [], []
-            for v in valid_mask_list:
-                try:
-                    vidx.append(v[1].item())
-                    vtokens.append(tokenizer.convert_ids_to_tokens(v[1].item()))
-                except AttributeError:
-                    vidx.append(v[1])
-                    vtokens.append(tokenizer.convert_ids_to_tokens(v[1]))
-                vscores.append(scores[v[0]][v[1]].item())
-            sorted_idx = sorted(range(len(vscores)), key=lambda k: vscores[k], reverse=True)
-            constrained_next_id = torch.argmax(scores, dim=-1).item()
-            constrained_score = scores[0][constrained_next_id].item()
-            constrained_next_token = tokenizer.convert_ids_to_tokens(constrained_next_id)
-            print("Constrained next id: {}, token: {}, score: {}\n".format(constrained_next_id, constrained_next_token, constrained_score))
-            print("Valid scores:\n{}\n".format("\n".join([str((vidx[i], vtokens[i], vscores[i])) for i in sorted_idx])))
-            import pdb; pdb.set_trace()
-        else:
-            scores = self.mask_vocab(scores, beam_idx, valid_mask_list)
+        #if forced_answer[0]:
+        #    prev_ids = input_ids[0][input_length:].tolist()
+        #    prev_tokens = tokenizer.convert_ids_to_tokens(prev_ids)
+        #    print("Previous ids: {}\nprev_tokens: {}\n".format(prev_ids, prev_tokens))
+        #    real_next_id = torch.argmax(scores, dim=-1).item()
+        #    real_score = scores[0][real_next_id].item()
+        #    real_next_token = tokenizer.convert_ids_to_tokens(real_next_id)
+        #    print("Real next id: {}, token: {}, real_score: {}".format(real_next_id, real_next_token, real_score))
+        #    rscores, rids = torch.topk(scores, 10, dim=1, largest=True, sorted=True)
+        #    rscores, rids = [s.item() for s in rscores[0]], [i.item() for i in rids[0]]
+        #    rtokens = tokenizer.convert_ids_to_tokens(rids)
+        #    print("Original top 10:\n{}\n".format("\n".join([str((rids[i], rtokens[i], rscores[i])) for i in range(len(rscores))])))
+        #    scores = self.mask_vocab(scores, beam_idx, valid_mask_list)
+        #    vidx, vtokens, vscores = [], [], []
+        #    for v in valid_mask_list:
+        #        try:
+        #            vidx.append(v[1].item())
+        #            vtokens.append(tokenizer.convert_ids_to_tokens(v[1].item()))
+        #        except AttributeError:
+        #            vidx.append(v[1])
+        #            vtokens.append(tokenizer.convert_ids_to_tokens(v[1]))
+        #        vscores.append(scores[v[0]][v[1]].item())
+        #    sorted_idx = sorted(range(len(vscores)), key=lambda k: vscores[k], reverse=True)
+        #    constrained_next_id = torch.argmax(scores, dim=-1).item()
+        #    constrained_score = scores[0][constrained_next_id].item()
+        #    constrained_next_token = tokenizer.convert_ids_to_tokens(constrained_next_id)
+        #    print("Constrained next id: {}, token: {}, score: {}\n".format(constrained_next_id, constrained_next_token, constrained_score))
+        #    print("Valid scores:\n{}\n".format("\n".join([str((vidx[i], vtokens[i], vscores[i])) for i in sorted_idx])))
+        #    import pdb; pdb.set_trace()
+        #else:
+        scores = self.mask_vocab(scores, beam_idx, valid_mask_list)
         return scores
 
     def greedy_search(
@@ -2210,11 +2211,11 @@ class GenerationMixin:
                 next_tokens_scores = self.set_scores_to_inf_for_invalid_questions(next_tokens_scores, input_ids, \
                     slot_constraints, empty_answer, delimiters, eos_token_id, input_length, tokenizer)
             elif constrained_type == 'template_input':
-                print("\n#####STEP {}####".format(step))
+                #print("\n#####STEP {}####".format(step))
                 next_tokens_scores = self.set_scores_to_inf_for_invalid_inputs(next_tokens_scores, input_ids, \
                     slot_constraints, valid_input, empty_answer, delimiters, eos_token_id, input_length, tokenizer)
             elif constrained_type == 'template_candidates':
-                print("\n#####STEP {}####".format(step))
+                #print("\n#####STEP {}####".format(step))
                 next_tokens_scores = self.set_scores_to_inf_for_invalid_candidates(next_tokens_scores, input_ids, \
                     slot_constraints, valid_candidates, empty_answer, delimiters, eos_token_id, input_length, tokenizer)
             
