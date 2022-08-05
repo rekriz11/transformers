@@ -1666,7 +1666,7 @@ class GenerationMixin:
                     valid_mask_list = [[beam_idx, constraint[0]]]
                 else:
                     ## Check if slot constraint has been correctly generated so far
-                    if constraint[:len(cur_slot)].tolist() != cur_slot:
+                    if constraint[:len(cur_slot)] != cur_slot:
                         valid_mask_list = []
                         print("ERROR generating slot constraint!!")
                         import pdb; pdb.set_trace()
@@ -1776,7 +1776,7 @@ class GenerationMixin:
                         found = False
                         for i in range(len(used_context)):
                             ## When a non-overlapping previous candidate is found, mark it as used context
-                            if context[i:i+len(prev)].tolist() == prev and used_context[i:i+len(prev)] == [0 for j in range(len(prev))]:
+                            if context[i:i+len(prev)] == prev and used_context[i:i+len(prev)] == [0 for j in range(len(prev))]:
                                 used_context[i:i+len(prev)] = [1 for j in range(len(prev))]
                                 found = True
                                 break
@@ -1806,7 +1806,7 @@ class GenerationMixin:
                         valid_mask_list = []
                         ## Iterate through input text to find all instances of the answer that has been generated so far,
                         for idx in range(len(context) - len(cur_answer)):
-                            if context[idx:idx+len(cur_answer)].tolist() == cur_answer and \
+                            if context[idx:idx+len(cur_answer)] == cur_answer and \
                             used_context[idx:idx+len(cur_answer)] == [0 for j in range(len(cur_answer))]:
                                 ## The next subword following each instance is a valid next step, 
                                 ## unless it's been used by a previous candidate
@@ -1821,7 +1821,7 @@ class GenerationMixin:
                     valid_mask_list = [[beam_idx, constraint[0]]]
                 else:
                     ## Check if slot constraint has been correctly generated so far
-                    if constraint[:len(cur_slot)].tolist() != cur_slot:
+                    if constraint[:len(cur_slot)] != cur_slot:
                         valid_mask_list = []
                         print("ERROR generating slot constraint!!")
                         import pdb; pdb.set_trace()
@@ -1932,7 +1932,7 @@ class GenerationMixin:
             valid_mask_list = []
             if forced_answer[beam_idx]:
                 ## Remove previously generated candidates from the list of valid candidates
-                cur_valid_candidates = [v.tolist() for v in valid_candidates]
+                cur_valid_candidates = valid_candidates
                 #print("intial cur_valid_candidates: {}".format(cur_valid_candidates))
                 for prev in prev_answer:
                     try:
@@ -1977,7 +1977,7 @@ class GenerationMixin:
                     valid_mask_list = [[beam_idx, constraint[0]]]
                 else:
                     ## Check if slot constraint has been correctly generated so far
-                    if constraint[:len(cur_slot)].tolist() != cur_slot:
+                    if constraint[:len(cur_slot)] != cur_slot:
                         valid_mask_list = []
                         print("ERROR generating slot constraint!!")
                         import pdb; pdb.set_trace()
