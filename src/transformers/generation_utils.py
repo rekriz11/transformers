@@ -1946,7 +1946,6 @@ class GenerationMixin:
                 #    print("updated cur_valid_candidates: {}".format(cur_valid_candidates))
                 if not cur_answer:
                     ## If no candidate has been generated yet, allow the first subword of all candidates
-                    import pdb; pdb.set_trace()
                     cur_valid_candidates = list(set([v[0] for v in cur_valid_candidates]))
                     if not prev_answer:
                         ## Allow empty answer if no previous answers
@@ -1997,6 +1996,7 @@ class GenerationMixin:
                         import pdb; pdb.set_trace()
             else:
                 valid_mask_list.append([beam_idx, eos_token_id])
+        '''
         if forced_answer[0]:
             prev_ids = input_ids[0][input_length:].tolist()
             prev_tokens = tokenizer.convert_ids_to_tokens(prev_ids)
@@ -2027,7 +2027,8 @@ class GenerationMixin:
             print("Valid scores:\n{}\n".format("\n".join([str((vidx[i], vtokens[i], vscores[i])) for i in sorted_idx])))
             import pdb; pdb.set_trace()
         else:
-            scores = self.mask_vocab(scores, beam_idx, valid_mask_list)
+        '''
+        scores = self.mask_vocab(scores, beam_idx, valid_mask_list)
         return scores
 
     def greedy_search(
