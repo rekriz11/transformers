@@ -1621,9 +1621,8 @@ class GenerationMixin:
             if force_input[beam_idx] == 0:
                 force_entity[beam_idx] = entity_idx
                 cur_entities[beam_idx] = cur_cand
-            import pdb; pdb.set_trace()
-        print("\n\ninput_ids: {}\nforce_entity: {}\ncur_entities: {}\nforce_input: {}\ncur_input: {}\ndelimiters: {}\nempty answer: {}\n".format(input_ids, force_entity, \
-            cur_entities, force_input, cur_input, delimiters, empty_answer))
+        #print("\n\ninput_ids: {}\nforce_entity: {}\ncur_entities: {}\nforce_input: {}\ncur_input: {}\ndelimiters: {}\nempty answer: {}\n".format(input_ids, force_entity, \
+        #    cur_entities, force_input, cur_input, delimiters, empty_answer))
         for beam_idx, (cur_ent, cur_inp) in enumerate(zip(cur_entities, cur_input)):
             ## If EOS has appeared twice, stop masking
             if len(cur_tokens) > 1 and cur_tokens.count(eos_token_id) >= 2:
@@ -1693,27 +1692,26 @@ class GenerationMixin:
                             valid_mask_list = [[beam_idx, eos_token_id]]
                             #print("END OF SEQUENCE found, not top candidate but not found higher...\ntokens: {}, valid_mask_list: {}".format(tokens[beam_idx], valid_mask_list))
         #if force_input[0]:
-        prev_ids = input_ids[0].tolist()
-        prev_tokens = tokenizer.convert_ids_to_tokens(prev_ids)
-        print("Previous ids: {}\nprev_tokens: {}\n".format(prev_ids, prev_tokens))
-        real_next_id = torch.argmax(scores, dim=-1).item()
-        real_score = scores[0][real_next_id].item()
-        real_next_token = tokenizer.convert_ids_to_tokens(real_next_id)
-        print("Real next id: {}, token: {}, real_score: {}".format(real_next_id, real_next_token, real_score))
-        rscores, rids = torch.topk(scores, 10, dim=1, largest=True, sorted=True)
-        rscores, rids = [s.item() for s in rscores[0]], [i.item() for i in rids[0]]
-        rtokens = tokenizer.convert_ids_to_tokens(rids)
-        print("Original top 10:\n{}\n".format("\n".join([str((rids[i], rtokens[i], rscores[i])) for i in range(len(rscores))])))
+        #prev_ids = input_ids[0].tolist()
+        #prev_tokens = tokenizer.convert_ids_to_tokens(prev_ids)
+        #print("Previous ids: {}\nprev_tokens: {}\n".format(prev_ids, prev_tokens))
+        #real_next_id = torch.argmax(scores, dim=-1).item()
+        #real_score = scores[0][real_next_id].item()
+        #real_next_token = tokenizer.convert_ids_to_tokens(real_next_id)
+        #print("Real next id: {}, token: {}, real_score: {}".format(real_next_id, real_next_token, real_score))
+        #rscores, rids = torch.topk(scores, 10, dim=1, largest=True, sorted=True)
+        #rscores, rids = [s.item() for s in rscores[0]], [i.item() for i in rids[0]]
+        #rtokens = tokenizer.convert_ids_to_tokens(rids)
+        #print("Original top 10:\n{}\n".format("\n".join([str((rids[i], rtokens[i], rscores[i])) for i in range(len(rscores))])))
         scores = self.mask_vocab(scores, beam_idx, valid_mask_list)
-        constrained_next_id = torch.argmax(scores, dim=-1).item()
-        constrained_score = scores[0][constrained_next_id].item()
-        constrained_next_token = tokenizer.convert_ids_to_tokens(constrained_next_id)
-        print("Constrained next id: {}, token: {}, score: {}".format(constrained_next_id, constrained_next_token, constrained_score))
-        cscores, cids = torch.topk(scores, 5, dim=1, largest=True, sorted=True)
-        cscores, cids = [s.item() for s in cscores[0]], [i.item() for i in cids[0]]
-        ctokens = tokenizer.convert_ids_to_tokens(cids)
-        print("Constrained top 10:\n{}\n".format("\n".join([str((cids[i], ctokens[i], cscores[i])) for i in range(len(cscores)) if cscores[i] != -math.inf])))
-        import pdb; pdb.set_trace()
+        #constrained_next_id = torch.argmax(scores, dim=-1).item()
+        #constrained_score = scores[0][constrained_next_id].item()
+        #constrained_next_token = tokenizer.convert_ids_to_tokens(constrained_next_id)
+        #print("Constrained next id: {}, token: {}, score: {}".format(constrained_next_id, constrained_next_token, constrained_score))
+        #cscores, cids = torch.topk(scores, 5, dim=1, largest=True, sorted=True)
+        #cscores, cids = [s.item() for s in cscores[0]], [i.item() for i in cids[0]]
+        #ctokens = tokenizer.convert_ids_to_tokens(cids)
+        #print("Constrained top 10:\n{}\n".format("\n".join([str((cids[i], ctokens[i], cscores[i])) for i in range(len(cscores)) if cscores[i] != -math.inf])))
         #else:
         #    scores = self.mask_vocab(scores, beam_idx, valid_mask_list)
         return scores
