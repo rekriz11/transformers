@@ -1934,7 +1934,7 @@ class GenerationMixin:
             valid_mask_list = []
             if forced_answer[beam_idx]:
                 ## Remove previously generated candidates from the list of valid candidates
-                cur_valid_candidates = valid_candidates
+                cur_valid_candidates = list(valid_candidates)
                 #print("intial cur_valid_candidates: {}".format(cur_valid_candidates))
                 for prev in prev_answer:
                     try:
