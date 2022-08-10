@@ -1928,6 +1928,14 @@ class GenerationMixin:
             if len(input_ids) > 1 and input_ids[beam_idx].tolist().count(eos_token_id) >= 2:
                 continue
             valid_mask_list = []
+            ## Removes any duplicate beams from consideration (to avoid repeat candidates)
+            if beam_idx > 0:
+                is_duplicate = False
+                for beam_idx2 in range(beam_idx):
+                    if input_ids[beam_idx][input_length:] == input_ids[beam_idx2][input_length:]:
+                        is_duplicate = True
+                if is_duplicate:
+                    continue
             if forced_answer[beam_idx]:
                 ## Remove previously generated candidates from the list of valid candidates
                 cur_valid_candidates = list(valid_candidates)
