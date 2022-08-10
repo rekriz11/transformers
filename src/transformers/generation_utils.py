@@ -1694,30 +1694,27 @@ class GenerationMixin:
             else:
                 valid_mask_list.append([beam_idx, eos_token_id])
 
+            print("\nbeam_idx: {}".format(beam_idx))
+            prev_ids = input_ids[beam_idx][input_length:].tolist()
+            prev_tokens = tokenizer.convert_ids_to_tokens(prev_ids)
+            print("Previous ids: {}\nprev_tokens: {}\n".format(prev_ids, prev_tokens))
+            real_next_id = torch.argmax(scores[beam_idx], dim=-1).item()
+            real_score = scores[beam_idx][real_next_id].item()
+            real_next_token = tokenizer.convert_ids_to_tokens(real_next_id)
+            print("Real next id: {}, token: {}, real_score: {}".format(real_next_id, real_next_token, real_score))
+            if real_next_id == single_new_line:
+                valid_mask_list.append([beam_idx, slot_delim])
             ## If valid mask is not empty or we're forcing a slot question, mask vocab!
             if valid_mask_list or forced_slot[beam_idx]:
                 scores = self.mask_vocab(scores, beam_idx, valid_mask_list)
-
-        '''prev_ids = input_ids[0][input_length:].tolist()
-        prev_tokens = tokenizer.convert_ids_to_tokens(prev_ids)
-        print("Previous ids: {}\nprev_tokens: {}\n".format(prev_ids, prev_tokens))
-        real_next_id = torch.argmax(scores, dim=-1).item()
-        real_score = scores[0][real_next_id].item()
-        real_next_token = tokenizer.convert_ids_to_tokens(real_next_id)
-        print("Real next id: {}, token: {}, real_score: {}".format(real_next_id, real_next_token, real_score))
-        if real_next_id == single_new_line:
-            valid_mask_list.append([beam_idx, slot_delim])
-        ## If there's something in the mask list, make sure to mask everything else
-        
-            constrained_next_id = torch.argmax(scores, dim=-1).item()
-            constrained_score = scores[0][constrained_next_id].item()
+            ## If there's something in the mask list, make sure to mask everything else
+            constrained_next_id = torch.argmax(scores[beam_idx], dim=-1).item()
+            constrained_score = scores[beam_idx][constrained_next_id].item()
             constrained_next_token = tokenizer.convert_ids_to_tokens(constrained_next_id)
             print("Constrained next id: {}, token: {}, score: {}".format(constrained_next_id, constrained_next_token, constrained_score))
-            if real_next_id != constrained_next_id:
-                print("Not the same!")
-                import pdb; pdb.set_trace()
-        else:
-            print("No constraints in place")'''
+            else:
+                print("No constraints in place.")
+        import pdb; pdb.set_trace()
         return scores
 
     ## Added constrained generation helper to only allow generation from the input
@@ -2764,15 +2761,15 @@ class GenerationMixin:
             next_token_scores_processed = logits_processor(input_ids, next_token_scores)
             ## Added function for constrained decoding
             if constrained_type == 'template_questions':
-                #print("\n#####STEP {}####".format(step))
+                print("\n\n#####STEP {}####".format(step))
                 next_tokens_scores = self.set_scores_to_inf_for_invalid_questions(next_token_scores_processed, input_ids, \
                     slot_constraints, empty_answer, delimiters, eos_token_id, input_length, tokenizer)
             elif constrained_type == 'template_input':
-                #print("\n#####STEP {}####".format(step))
+                print("\n\n#####STEP {}####".format(step))
                 next_tokens_scores = self.set_scores_to_inf_for_invalid_inputs(next_token_scores_processed, input_ids, \
                     slot_constraints, valid_input, empty_answer, delimiters, eos_token_id, input_length, tokenizer)
             elif constrained_type == 'template_candidates':
-                #print("\n#####STEP {}####".format(step))
+                print("\n\n#####STEP {}####".format(step))
                 next_tokens_scores = self.set_scores_to_inf_for_invalid_candidates(next_token_scores_processed, input_ids, \
                     slot_constraints, valid_candidates, empty_answer, delimiters, eos_token_id, input_length, tokenizer)
             next_token_scores = next_token_scores_processed + beam_scores[:, None].expand_as(next_token_scores)
