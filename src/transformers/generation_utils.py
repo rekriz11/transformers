@@ -1594,6 +1594,7 @@ class GenerationMixin:
 
     ## Added constrained generation helper to force generation of all questions
     def set_scores_to_inf_for_invalid_questions(self, scores, input_ids, slot_constraints, empty_answer, delimiters, eos_token_id, input_length, tokenizer):
+        single_new_line = tokenizer.encode('\n')['input_ids'][1]
         [answer_start_delim, answer_delim, slot_delim] = delimiters
         forced_slot, cur_slots = [0 for i in range(scores.shape[0])], [[] for i in range(scores.shape[0])]
         unconstrained_answer = [0 for i in range(scores.shape[0])]
@@ -1690,6 +1691,8 @@ class GenerationMixin:
         real_score = scores[0][real_next_id].item()
         real_next_token = tokenizer.convert_ids_to_tokens(real_next_id)
         print("Real next id: {}, token: {}, real_score: {}".format(real_next_id, real_next_token, real_score))
+        if real_next_id == single_new_line:
+            valid_mask_list.append([beam_idx, slot_delim])
         ## If there's something in the mask list, make sure to mask everything else
         if valid_mask_list:
             scores = self.mask_vocab(scores, beam_idx, valid_mask_list)
