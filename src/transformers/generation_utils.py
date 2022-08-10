@@ -1665,11 +1665,11 @@ class GenerationMixin:
                         behind_best = True
                         break
                 if is_duplicate:
-                    print("Duplicate beam at beam_idx {}, mask everything.".format(beam_idx))
+                    #print("Duplicate beam at beam_idx {}, mask everything.".format(beam_idx))
                     scores = self.mask_vocab(scores, beam_idx, valid_mask_list)
                     continue
                 elif behind_best:
-                    print("beam_idx {} hasn't finished current slot but better candidate has, mask everything.".format(beam_idx))
+                    #print("beam_idx {} hasn't finished current slot but better candidate has, mask everything.".format(beam_idx))
                     scores = self.mask_vocab(scores, beam_idx, valid_mask_list)
                     continue
             if forced_slot[beam_idx] > len(slot_constraints):
@@ -1708,25 +1708,24 @@ class GenerationMixin:
                     else:
                         print("ERROR, check what went wrong!")
                         import pdb; pdb.set_trace()
-            print("\nbeam_idx: {}".format(beam_idx))
+            '''print("\nbeam_idx: {}".format(beam_idx))
             prev_ids = input_ids[beam_idx][input_length:].tolist()
             prev_tokens = tokenizer.convert_ids_to_tokens(prev_ids)
             print("Previous ids: {}\nprev_tokens: {}\n".format(prev_ids, prev_tokens))
             real_next_id = torch.argmax(scores[beam_idx], dim=-1).item()
             real_score = scores[beam_idx][real_next_id].item()
             real_next_token = tokenizer.convert_ids_to_tokens(real_next_id)
-            print("Real next id: {}, token: {}, real_score: {}".format(real_next_id, real_next_token, real_score))
+            print("Real next id: {}, token: {}, real_score: {}".format(real_next_id, real_next_token, real_score))'''
             ## If valid mask is not empty or we're forcing a slot question, mask vocab!
             if valid_mask_list or not unconstrained_answer[beam_idx]:
-                scores = self.mask_vocab(scores, beam_idx, valid_mask_list)
-                ## If there's something in the mask list, make sure to mask everything else
-                constrained_next_id = torch.argmax(scores[beam_idx], dim=-1).item()
+                scores = self.mask_vocab(scores, beam_idx, valid_mask_list)                
+                '''constrained_next_id = torch.argmax(scores[beam_idx], dim=-1).item()
                 constrained_score = scores[beam_idx][constrained_next_id].item()
                 constrained_next_token = tokenizer.convert_ids_to_tokens(constrained_next_id)
-                print("Constrained next id: {}, token: {}, score: {}".format(constrained_next_id, constrained_next_token, constrained_score))
+                print("Constrained next id: {}, token: {}, score: {}".format(constrained_next_id, constrained_next_token, constrained_score))'''
             else:
                 print("No constraints in place.")
-        import pdb; pdb.set_trace()
+        #import pdb; pdb.set_trace()
         return scores
 
     ## Added constrained generation helper to only allow generation from the input
@@ -1796,11 +1795,11 @@ class GenerationMixin:
                         behind_best = True
                         break
                 if is_duplicate:
-                    print("Duplicate beam at beam_idx {}, mask everything.".format(beam_idx))
+                    #print("Duplicate beam at beam_idx {}, mask everything.".format(beam_idx))
                     scores = self.mask_vocab(scores, beam_idx, valid_mask_list)
                     continue
                 elif behind_best:
-                    print("beam_idx {} hasn't finished current slot but better candidate has, mask everything.".format(beam_idx))
+                    #print("beam_idx {} hasn't finished current slot but better candidate has, mask everything.".format(beam_idx))
                     scores = self.mask_vocab(scores, beam_idx, valid_mask_list)
                     continue
             if forced_slot[beam_idx] > len(slot_constraints):
@@ -1878,7 +1877,7 @@ class GenerationMixin:
                         print("ERROR, check what went wrong!")
                         import pdb; pdb.set_trace()
             #if forced_answer[beam_idx]:
-            if True:
+            '''if True:
                 print("\nbeam_idx: {}".format(beam_idx))
                 prev_ids = input_ids[beam_idx][input_length:].tolist()
                 prev_tokens = tokenizer.convert_ids_to_tokens(prev_ids)
@@ -1892,9 +1891,9 @@ class GenerationMixin:
                 constrained_score = scores[beam_idx][constrained_next_id].item()
                 constrained_next_token = tokenizer.convert_ids_to_tokens(constrained_next_id)
                 print("Constrained next id: {}, token: {}, score: {}".format(constrained_next_id, constrained_next_token, constrained_score))
-            else:
-                scores = self.mask_vocab(scores, beam_idx, valid_mask_list)
-        import pdb; pdb.set_trace()
+            else:'''
+            scores = self.mask_vocab(scores, beam_idx, valid_mask_list)
+        #import pdb; pdb.set_trace()
         return scores
 
     ## Added constrained generation helper to only allow generation from valid candidates
@@ -1964,11 +1963,11 @@ class GenerationMixin:
                         behind_best = True
                         break
                 if is_duplicate:
-                    print("Duplicate beam at beam_idx {}, mask everything.".format(beam_idx))
+                    #print("Duplicate beam at beam_idx {}, mask everything.".format(beam_idx))
                     scores = self.mask_vocab(scores, beam_idx, valid_mask_list)
                     continue
                 elif behind_best:
-                    print("beam_idx {} hasn't finished current slot but better candidate has, mask everything.".format(beam_idx))
+                    #print("beam_idx {} hasn't finished current slot but better candidate has, mask everything.".format(beam_idx))
                     scores = self.mask_vocab(scores, beam_idx, valid_mask_list)
                     continue
             if forced_slot[beam_idx] > len(slot_constraints):
@@ -2036,7 +2035,7 @@ class GenerationMixin:
                         import pdb; pdb.set_trace()
         
             #if forced_answer[beam_idx]:
-            if True:
+            '''if True:
                 print("\nbeam_idx: {}".format(beam_idx))
                 prev_ids = input_ids[beam_idx][input_length:].tolist()
                 prev_tokens = tokenizer.convert_ids_to_tokens(prev_ids)
@@ -2050,9 +2049,9 @@ class GenerationMixin:
                 constrained_score = scores[beam_idx][constrained_next_id].item()
                 constrained_next_token = tokenizer.convert_ids_to_tokens(constrained_next_id)
                 print("Constrained next id: {}, token: {}, score: {}".format(constrained_next_id, constrained_next_token, constrained_score))
-            else:
-                scores = self.mask_vocab(scores, beam_idx, valid_mask_list)
-        import pdb; pdb.set_trace()
+            else:'''
+            scores = self.mask_vocab(scores, beam_idx, valid_mask_list)
+        #import pdb; pdb.set_trace()
         return scores
 
     def greedy_search(
@@ -2782,15 +2781,15 @@ class GenerationMixin:
             next_token_scores_processed = logits_processor(input_ids, next_token_scores)
             ## Added function for constrained decoding
             if constrained_type == 'template_questions':
-                print("\n\n#####STEP {}####".format(step))
+                #print("\n\n#####STEP {}####".format(step))
                 next_tokens_scores = self.set_scores_to_inf_for_invalid_questions(next_token_scores_processed, input_ids, \
                     slot_constraints, empty_answer, delimiters, eos_token_id, input_length, tokenizer)
             elif constrained_type == 'template_input':
-                print("\n\n#####STEP {}####".format(step))
+                #print("\n\n#####STEP {}####".format(step))
                 next_tokens_scores = self.set_scores_to_inf_for_invalid_inputs(next_token_scores_processed, input_ids, \
                     slot_constraints, valid_input, empty_answer, delimiters, eos_token_id, input_length, tokenizer)
             elif constrained_type == 'template_candidates':
-                print("\n\n#####STEP {}####".format(step))
+                #print("\n\n#####STEP {}####".format(step))
                 next_tokens_scores = self.set_scores_to_inf_for_invalid_candidates(next_token_scores_processed, input_ids, \
                     slot_constraints, valid_candidates, empty_answer, delimiters, eos_token_id, input_length, tokenizer)
             next_token_scores = next_token_scores_processed + beam_scores[:, None].expand_as(next_token_scores)
