@@ -1663,7 +1663,7 @@ class GenerationMixin:
             if beam_idx > 0:
                 is_duplicate = False
                 for beam_idx2 in range(beam_idx):
-                    if input_ids[beam_idx][input_length:] == input_ids[beam_idx2][input_length:]:
+                    if input_ids[beam_idx][input_length:].tolist() == input_ids[beam_idx2][input_length:].tolist():
                         is_duplicate = True
                         break
                 if is_duplicate:
@@ -1791,7 +1791,7 @@ class GenerationMixin:
             if beam_idx > 0:
                 is_duplicate = False
                 for beam_idx2 in range(beam_idx):
-                    if input_ids[beam_idx][input_length:] == input_ids[beam_idx2][input_length:]:
+                    if input_ids[beam_idx][input_length:].tolist() == input_ids[beam_idx2][input_length:].tolist():
                         is_duplicate = True
                         break
                 if is_duplicate:
@@ -1954,7 +1954,7 @@ class GenerationMixin:
             if beam_idx > 0:
                 is_duplicate = False
                 for beam_idx2 in range(beam_idx):
-                    if input_ids[beam_idx][input_length:] == input_ids[beam_idx2][input_length:]:
+                    if input_ids[beam_idx][input_length:].tolist() == input_ids[beam_idx2][input_length:].tolist():
                         is_duplicate = True
                         break
                 if is_duplicate:
@@ -2771,7 +2771,6 @@ class GenerationMixin:
             )  # (batch_size * num_beams, vocab_size)
 
             next_token_scores_processed = logits_processor(input_ids, next_token_scores)
-            import pdb; pdb.set_trace()
             ## Added function for constrained decoding
             if constrained_type == 'template_questions':
                 print("\n\n#####STEP {}####".format(step))
