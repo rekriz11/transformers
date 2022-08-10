@@ -1379,6 +1379,13 @@ class GenerationMixin:
                 output_scores=output_scores,
                 return_dict_in_generate=return_dict_in_generate,
                 synced_gpus=synced_gpus,
+                constrained_type=constrained_type,
+                slot_constraints=slot_constraints,
+                valid_input=valid_input,
+                valid_candidates=valid_candidates,
+                empty_answer=empty_answer,
+                delimiters=delimiters,
+                tokenizer=tokenizer,
                 **model_kwargs,
             )
 
@@ -1843,7 +1850,7 @@ class GenerationMixin:
                 valid_mask_list.append([beam_idx, eos_token_id])
         
         #if forced_answer[0]:
-        if True:
+        '''if True:
             prev_ids = input_ids[0][input_length:].tolist()
             prev_tokens = tokenizer.convert_ids_to_tokens(prev_ids)
             print("Previous ids: {}\nprev_tokens: {}\n".format(prev_ids, prev_tokens))
@@ -1865,8 +1872,8 @@ class GenerationMixin:
             ctokens = tokenizer.convert_ids_to_tokens(cids)
             print("Constrained top 10:\n{}\n".format("\n".join([str((cids[i], ctokens[i], cscores[i])) for i in range(len(cscores)) if cscores[i] != -math.inf])))
             import pdb; pdb.set_trace()
-        else:
-            scores = self.mask_vocab(scores, beam_idx, valid_mask_list)
+        else:'''
+        scores = self.mask_vocab(scores, beam_idx, valid_mask_list)
         return scores
 
     ## Added constrained generation helper to only allow generation from valid candidates
@@ -1994,7 +2001,7 @@ class GenerationMixin:
                 valid_mask_list.append([beam_idx, eos_token_id])
         
         #if forced_answer[0]:
-        if True:
+        '''if True:
             prev_ids = input_ids[0][input_length:].tolist()
             prev_tokens = tokenizer.convert_ids_to_tokens(prev_ids)
             print("Previous ids: {}\nprev_tokens: {}\n".format(prev_ids, prev_tokens))
@@ -2023,8 +2030,8 @@ class GenerationMixin:
             print("Constrained next id: {}, token: {}, score: {}\n".format(constrained_next_id, constrained_next_token, constrained_score))
             print("Valid scores:\n{}\n".format("\n".join([str((vidx[i], vtokens[i], vscores[i])) for i in sorted_idx])))
             import pdb; pdb.set_trace()
-        else:
-            scores = self.mask_vocab(scores, beam_idx, valid_mask_list)
+        else:'''
+        scores = self.mask_vocab(scores, beam_idx, valid_mask_list)
         return scores
 
     def greedy_search(
@@ -2554,6 +2561,13 @@ class GenerationMixin:
         output_scores: Optional[bool] = None,
         return_dict_in_generate: Optional[bool] = None,
         synced_gpus: Optional[bool] = False,
+        constrained_type: Optional[str] = None,
+        slot_constraints: Optional[List[torch.tensor]] = None,
+        valid_input: Optional[torch.tensor] = None,
+        valid_candidates: Optional[List[torch.tensor]] = None,
+        empty_answer: Optional[torch.tensor] = None,
+        delimiters: Optional[List[int]] = None,
+        tokenizer: Optional = None,
         **model_kwargs,
     ) -> Union[BeamSearchOutput, torch.LongTensor]:
         r"""
@@ -2743,6 +2757,19 @@ class GenerationMixin:
             )  # (batch_size * num_beams, vocab_size)
 
             next_token_scores_processed = logits_processor(input_ids, next_token_scores)
+            ## Added function for constrained decoding
+            if constrained_type == 'template_questions':
+                #print("\n#####STEP {}####".format(step))
+                next_tokens_scores = self.set_scores_to_inf_for_invalid_questions(next_token_scores_processed, input_ids, \
+                    slot_constraints, empty_answer, delimiters, eos_token_id, input_length, tokenizer)
+            elif constrained_type == 'template_input':
+                #print("\n#####STEP {}####".format(step))
+                next_tokens_scores = self.set_scores_to_inf_for_invalid_inputs(next_token_scores_processed, input_ids, \
+                    slot_constraints, valid_input, empty_answer, delimiters, eos_token_id, input_length, tokenizer)
+            elif constrained_type == 'template_candidates':
+                #print("\n#####STEP {}####".format(step))
+                next_tokens_scores = self.set_scores_to_inf_for_invalid_candidates(next_token_scores_processed, input_ids, \
+                    slot_constraints, valid_candidates, empty_answer, delimiters, eos_token_id, input_length, tokenizer)
             next_token_scores = next_token_scores_processed + beam_scores[:, None].expand_as(next_token_scores)
 
             # Store scores, attentions and hidden_states when required
