@@ -1608,6 +1608,10 @@ class GenerationMixin:
         prev_answers, cur_answers = [[] for i in range(scores.shape[0])], [[] for i in range(scores.shape[0])]
         ## Determines which step we're in (slot question vs slot answer)
         for beam_idx in range(scores.shape[0]):
+            print("\nbeam_idx: {}".format(beam_idx))
+            prev_ids = input_ids[beam_idx][input_length:].tolist()
+            prev_tokens = tokenizer.convert_ids_to_tokens(prev_ids)
+            print("Previous ids: {}\nprev_tokens: {}\n".format(prev_ids, prev_tokens))
             cur_tokens = input_ids[beam_idx][input_length:].tolist()
             if cur_tokens != [] and (cur_tokens[-1] == 2 or cur_tokens.count(eos_token_id) >= 1):
                 continue
@@ -1693,11 +1697,7 @@ class GenerationMixin:
                     valid_mask_list.append([beam_idx, slot_delim])
             else:
                 valid_mask_list.append([beam_idx, eos_token_id])
-
             print("\nbeam_idx: {}".format(beam_idx))
-            prev_ids = input_ids[beam_idx][input_length:].tolist()
-            prev_tokens = tokenizer.convert_ids_to_tokens(prev_ids)
-            print("Previous ids: {}\nprev_tokens: {}\n".format(prev_ids, prev_tokens))
             real_next_id = torch.argmax(scores[beam_idx], dim=-1).item()
             real_score = scores[beam_idx][real_next_id].item()
             real_next_token = tokenizer.convert_ids_to_tokens(real_next_id)
