@@ -1594,7 +1594,7 @@ class GenerationMixin:
 
     ## Added constrained generation helper to force generation of all questions
     def set_scores_to_inf_for_invalid_questions(self, scores, input_ids, slot_constraints, empty_answer, delimiters, eos_token_id, input_length, tokenizer):
-        single_new_line = tokenizer.encode('\n')['input_ids'][1]
+        single_new_line = tokenizer('\n')['input_ids'][1]
         [answer_start_delim, answer_delim, slot_delim] = delimiters
         forced_slot, cur_slots = [0 for i in range(scores.shape[0])], [[] for i in range(scores.shape[0])]
         unconstrained_answer = [0 for i in range(scores.shape[0])]
