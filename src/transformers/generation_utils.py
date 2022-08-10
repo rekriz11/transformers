@@ -1723,8 +1723,8 @@ class GenerationMixin:
                 constrained_score = scores[beam_idx][constrained_next_id].item()
                 constrained_next_token = tokenizer.convert_ids_to_tokens(constrained_next_id)
                 print("Constrained next id: {}, token: {}, score: {}".format(constrained_next_id, constrained_next_token, constrained_score))'''
-            else:
-                print("No constraints in place.")
+            #else:
+            #    print("No constraints in place.")
         #import pdb; pdb.set_trace()
         return scores
 
