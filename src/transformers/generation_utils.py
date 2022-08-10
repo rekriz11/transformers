@@ -1659,13 +1659,20 @@ class GenerationMixin:
             valid_mask_list = []
             ## Removes any duplicate beams from consideration (to avoid repeat candidates)
             if beam_idx > 0:
-                is_duplicate = False
+                is_duplicate, behind_best = False, False
                 for beam_idx2 in range(beam_idx):
                     if input_ids[beam_idx][input_length:].tolist() == input_ids[beam_idx2][input_length:].tolist():
                         is_duplicate = True
                         break
+                    if forced_slot[beam_idx] < forced_slot[beam_idx2]:
+                        behind_best = True
+                        break
                 if is_duplicate:
-                    print("Duplicate beam at beam_idx {}, mask everything".format(beam_idx))
+                    print("Duplicate beam at beam_idx {}, mask everything.".format(beam_idx))
+                    scores = self.mask_vocab(scores, beam_idx, valid_mask_list)
+                    continue
+                elif behind_best:
+                    print("beam_idx {} hasn't finished current slot but better candidate has, mask everything.".format(beam_idx))
                     scores = self.mask_vocab(scores, beam_idx, valid_mask_list)
                     continue
             if unconstrained_answer[beam_idx]:
@@ -1856,7 +1863,7 @@ class GenerationMixin:
                     ## Check if slot constraint has been correctly generated so far
                     if constraint[:len(cur_slot)] != cur_slot:
                         valid_mask_list = []
-                    if len(constraint) > len(cur_slot):
+                    elif len(constraint) > len(cur_slot):
                         ## If slot constraint is unfinished, only allow model to generate next step
                         valid_mask_list = [[beam_idx, constraint[len(cur_slot)]]]
                     elif len(constraint) == len(cur_slot):
@@ -2010,7 +2017,7 @@ class GenerationMixin:
                         valid_mask_list = []
                         print("ERROR generating slot constraint!!")
                         import pdb; pdb.set_trace()
-                    if len(constraint) > len(cur_slot):
+                    elif len(constraint) > len(cur_slot):
                         ## If slot constraint is unfinished, only allow model to generate next step
                         valid_mask_list = [[beam_idx, constraint[len(cur_slot)]]]
                     elif len(constraint) == len(cur_slot):
