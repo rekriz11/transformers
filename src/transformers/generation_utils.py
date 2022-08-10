@@ -1654,6 +1654,8 @@ class GenerationMixin:
                     answer_delim, prev_answers, cur_answers, beam_idx)
         ## Determines valid next steps
         for beam_idx, (cur_slot, cur_answer, prev_answer) in enumerate(zip(cur_slots, cur_answers, prev_answers)):
+            if beam_idx == 0:
+                import pdb; pdb.set_trace()
             if len(input_ids) > 1 and input_ids[beam_idx].tolist().count(eos_token_id) >= 2:
                 continue
             valid_mask_list = []
