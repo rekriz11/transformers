@@ -1659,6 +1659,17 @@ class GenerationMixin:
             if len(input_ids) > 1 and input_ids[beam_idx].tolist().count(eos_token_id) >= 2:
                 continue
             valid_mask_list = []
+            ## Removes any duplicate beams from consideration (to avoid repeat candidates)
+            if beam_idx > 0:
+                is_duplicate = False
+                for beam_idx2 in range(beam_idx):
+                    if input_ids[beam_idx][input_length:] == input_ids[beam_idx2][input_length:]:
+                        is_duplicate = True
+                        break
+                if is_duplicate:
+                    print("Duplicate beam at beam_idx {}, mask everything".format(beam_idx))
+                    scores = self.mask_vocab(scores, beam_idx, valid_mask_list)
+                    continue
             if unconstrained_answer[beam_idx]:
                 if len(prev_answer) >= 5 or cur_answer == [empty_answer]:
                     ## Allow a max of 5 answers per question, and force the model to move on after outputting empty answer
@@ -1776,6 +1787,17 @@ class GenerationMixin:
             if len(input_ids) > 1 and input_ids[beam_idx].tolist().count(eos_token_id) >= 2:
                 continue
             valid_mask_list = []
+            ## Removes any duplicate beams from consideration (to avoid repeat candidates)
+            if beam_idx > 0:
+                is_duplicate = False
+                for beam_idx2 in range(beam_idx):
+                    if input_ids[beam_idx][input_length:] == input_ids[beam_idx2][input_length:]:
+                        is_duplicate = True
+                        break
+                if is_duplicate:
+                    print("Duplicate beam at beam_idx {}, mask everything".format(beam_idx))
+                    scores = self.mask_vocab(scores, beam_idx, valid_mask_list)
+                    continue
             if forced_answer[beam_idx]:
                 ## Finds all previous candidates in the context
                 used_context = [0 for i in range(len(context))]
@@ -1934,7 +1956,10 @@ class GenerationMixin:
                 for beam_idx2 in range(beam_idx):
                     if input_ids[beam_idx][input_length:] == input_ids[beam_idx2][input_length:]:
                         is_duplicate = True
+                        break
                 if is_duplicate:
+                    print("Duplicate beam at beam_idx {}, mask everything".format(beam_idx))
+                    scores = self.mask_vocab(scores, beam_idx, valid_mask_list)
                     continue
             if forced_answer[beam_idx]:
                 ## Remove previously generated candidates from the list of valid candidates
@@ -2003,6 +2028,7 @@ class GenerationMixin:
         
             #if forced_answer[beam_idx]:
             if True:
+                print("beam_idx: {}".format(beam_idx))
                 prev_ids = input_ids[beam_idx][input_length:].tolist()
                 prev_tokens = tokenizer.convert_ids_to_tokens(prev_ids)
                 print("Previous ids: {}\nprev_tokens: {}\n".format(prev_ids, prev_tokens))
