@@ -1787,13 +1787,20 @@ class GenerationMixin:
             valid_mask_list = []
             ## Removes any duplicate beams from consideration (to avoid repeat candidates)
             if beam_idx > 0:
-                is_duplicate = False
+                is_duplicate, behind_best = False, False
                 for beam_idx2 in range(beam_idx):
                     if input_ids[beam_idx][input_length:].tolist() == input_ids[beam_idx2][input_length:].tolist():
                         is_duplicate = True
                         break
+                    if forced_slot[beam_idx] < forced_slot[beam_idx2]:
+                        behind_best = True
+                        break
                 if is_duplicate:
-                    print("Duplicate beam at beam_idx {}, mask everything".format(beam_idx))
+                    print("Duplicate beam at beam_idx {}, mask everything.".format(beam_idx))
+                    scores = self.mask_vocab(scores, beam_idx, valid_mask_list)
+                    continue
+                elif behind_best:
+                    print("beam_idx {} hasn't finished current slot but better candidate has, mask everything.".format(beam_idx))
                     scores = self.mask_vocab(scores, beam_idx, valid_mask_list)
                     continue
             if forced_slot[beam_idx] > len(slot_constraints):
@@ -1872,9 +1879,10 @@ class GenerationMixin:
                         import pdb; pdb.set_trace()
             #if forced_answer[beam_idx]:
             if True:
+                print("\nbeam_idx: {}".format(beam_idx))
                 prev_ids = input_ids[beam_idx][input_length:].tolist()
                 prev_tokens = tokenizer.convert_ids_to_tokens(prev_ids)
-                print("Previous ids: {}\nprev_tokens: {}\n".format(prev_ids, prev_tokens))
+                print("Previous ids: {}\nprev_tokens: {}".format(prev_ids, prev_tokens))
                 real_next_id = torch.argmax(scores[beam_idx], dim=-1).item()
                 real_score = scores[beam_idx][real_next_id].item()
                 real_next_token = tokenizer.convert_ids_to_tokens(real_next_id)
@@ -1947,13 +1955,20 @@ class GenerationMixin:
             valid_mask_list = []
             ## Removes any duplicate beams from consideration (to avoid repeat candidates)
             if beam_idx > 0:
-                is_duplicate = False
+                is_duplicate, behind_best = False, False
                 for beam_idx2 in range(beam_idx):
                     if input_ids[beam_idx][input_length:].tolist() == input_ids[beam_idx2][input_length:].tolist():
                         is_duplicate = True
                         break
+                    if forced_slot[beam_idx] < forced_slot[beam_idx2]:
+                        behind_best = True
+                        break
                 if is_duplicate:
-                    print("Duplicate beam at beam_idx {}, mask everything".format(beam_idx))
+                    print("Duplicate beam at beam_idx {}, mask everything.".format(beam_idx))
+                    scores = self.mask_vocab(scores, beam_idx, valid_mask_list)
+                    continue
+                elif behind_best:
+                    print("beam_idx {} hasn't finished current slot but better candidate has, mask everything.".format(beam_idx))
                     scores = self.mask_vocab(scores, beam_idx, valid_mask_list)
                     continue
             if forced_slot[beam_idx] > len(slot_constraints):
@@ -2024,10 +2039,10 @@ class GenerationMixin:
         
             #if forced_answer[beam_idx]:
             if True:
-                print("beam_idx: {}".format(beam_idx))
+                print("\nbeam_idx: {}".format(beam_idx))
                 prev_ids = input_ids[beam_idx][input_length:].tolist()
                 prev_tokens = tokenizer.convert_ids_to_tokens(prev_ids)
-                print("Previous ids: {}\nprev_tokens: {}\n".format(prev_ids, prev_tokens))
+                print("Previous ids: {}\nprev_tokens: {}".format(prev_ids, prev_tokens))
                 real_next_id = torch.argmax(scores[beam_idx], dim=-1).item()
                 real_score = scores[beam_idx][real_next_id].item()
                 real_next_token = tokenizer.convert_ids_to_tokens(real_next_id)
