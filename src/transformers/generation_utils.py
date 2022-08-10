@@ -1683,25 +1683,25 @@ class GenerationMixin:
                         import pdb; pdb.set_trace()
             else:
                 valid_mask_list.append([beam_idx, eos_token_id])
-        #prev_ids = input_ids[0][input_length:].tolist()
-        #prev_tokens = tokenizer.convert_ids_to_tokens(prev_ids)
-        #print("Previous ids: {}\nprev_tokens: {}\n".format(prev_ids, prev_tokens))
-        #real_next_id = torch.argmax(scores, dim=-1).item()
-        #real_score = scores[0][real_next_id].item()
-        #real_next_token = tokenizer.convert_ids_to_tokens(real_next_id)
-        #print("Real next id: {}, token: {}, real_score: {}".format(real_next_id, real_next_token, real_score))
+        prev_ids = input_ids[0][input_length:].tolist()
+        prev_tokens = tokenizer.convert_ids_to_tokens(prev_ids)
+        print("Previous ids: {}\nprev_tokens: {}\n".format(prev_ids, prev_tokens))
+        real_next_id = torch.argmax(scores, dim=-1).item()
+        real_score = scores[0][real_next_id].item()
+        real_next_token = tokenizer.convert_ids_to_tokens(real_next_id)
+        print("Real next id: {}, token: {}, real_score: {}".format(real_next_id, real_next_token, real_score))
         ## If there's something in the mask list, make sure to mask everything else
         if valid_mask_list:
             scores = self.mask_vocab(scores, beam_idx, valid_mask_list)
-            #constrained_next_id = torch.argmax(scores, dim=-1).item()
-            #constrained_score = scores[0][constrained_next_id].item()
-            #constrained_next_token = tokenizer.convert_ids_to_tokens(constrained_next_id)
-            #print("Constrained next id: {}, token: {}, score: {}".format(constrained_next_id, constrained_next_token, constrained_score))
-            #if real_next_id != constrained_next_id:
-            #    print("Not the same!")
-            #    import pdb; pdb.set_trace()
-        #else:
-        #    print("No constraints in place")
+            constrained_next_id = torch.argmax(scores, dim=-1).item()
+            constrained_score = scores[0][constrained_next_id].item()
+            constrained_next_token = tokenizer.convert_ids_to_tokens(constrained_next_id)
+            print("Constrained next id: {}, token: {}, score: {}".format(constrained_next_id, constrained_next_token, constrained_score))
+            if real_next_id != constrained_next_id:
+                print("Not the same!")
+                import pdb; pdb.set_trace()
+        else:
+            print("No constraints in place")
         return scores
 
     ## Added constrained generation helper to only allow generation from the input
@@ -1838,15 +1838,9 @@ class GenerationMixin:
                         import pdb; pdb.set_trace()
             else:
                 valid_mask_list.append([beam_idx, eos_token_id])
-        '''
-        prev_ids = input_ids[0][input_length:].tolist()
-        prev_tokens = tokenizer.convert_ids_to_tokens(prev_ids)
-        print("Previous ids: {}\nprev_tokens: {}\n".format(prev_ids, prev_tokens))
-        real_next_id = torch.argmax(scores, dim=-1).item()
-        real_score = scores[0][real_next_id].item()
-        real_next_token = tokenizer.convert_ids_to_tokens(real_next_id)
-        print("Real next id: {}, token: {}, real_score: {}".format(real_next_id, real_next_token, real_score))
-        if forced_answer[0]:
+        
+        #if forced_answer[0]:
+        if True:
             prev_ids = input_ids[0][input_length:].tolist()
             prev_tokens = tokenizer.convert_ids_to_tokens(prev_ids)
             print("Previous ids: {}\nprev_tokens: {}\n".format(prev_ids, prev_tokens))
@@ -1869,8 +1863,7 @@ class GenerationMixin:
             print("Constrained top 10:\n{}\n".format("\n".join([str((cids[i], ctokens[i], cscores[i])) for i in range(len(cscores)) if cscores[i] != -math.inf])))
             import pdb; pdb.set_trace()
         else:
-        '''
-        scores = self.mask_vocab(scores, beam_idx, valid_mask_list)
+            scores = self.mask_vocab(scores, beam_idx, valid_mask_list)
         return scores
 
     ## Added constrained generation helper to only allow generation from valid candidates
@@ -1996,8 +1989,9 @@ class GenerationMixin:
                         import pdb; pdb.set_trace()
             else:
                 valid_mask_list.append([beam_idx, eos_token_id])
-        '''
-        if forced_answer[0]:
+        
+        #if forced_answer[0]:
+        if True:
             prev_ids = input_ids[0][input_length:].tolist()
             prev_tokens = tokenizer.convert_ids_to_tokens(prev_ids)
             print("Previous ids: {}\nprev_tokens: {}\n".format(prev_ids, prev_tokens))
@@ -2027,8 +2021,7 @@ class GenerationMixin:
             print("Valid scores:\n{}\n".format("\n".join([str((vidx[i], vtokens[i], vscores[i])) for i in sorted_idx])))
             import pdb; pdb.set_trace()
         else:
-        '''
-        scores = self.mask_vocab(scores, beam_idx, valid_mask_list)
+            scores = self.mask_vocab(scores, beam_idx, valid_mask_list)
         return scores
 
     def greedy_search(
