@@ -1682,6 +1682,9 @@ class GenerationMixin:
                 elif len(cur_answer) >= 8:
                     ## Force the model to end the answer if it's 10 subwords long
                     valid_mask_list = [[beam_idx, answer_delim]]
+                if real_next_id == single_new_line:
+                    ## IF the most likely next token is a single new line, only allow the slot delim
+                    valid_mask_list = [[beam_idx, slot_delim]]
             elif forced_slot[beam_idx]:
                 ## Subtract one from index to start at 0
                 constraint = slot_constraints[forced_slot[beam_idx]-1]
@@ -1705,8 +1708,6 @@ class GenerationMixin:
                         print("ERROR, check what went wrong!")
                         import pdb; pdb.set_trace()
                 real_next_id = torch.argmax(scores[beam_idx], dim=-1).item()
-                if real_next_id == single_new_line:
-                    valid_mask_list.append([beam_idx, slot_delim])
             else:
                 valid_mask_list.append([beam_idx, eos_token_id])
 
