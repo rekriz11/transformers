@@ -1612,6 +1612,10 @@ class GenerationMixin:
             prev_ids = input_ids[beam_idx][input_length:].tolist()
             prev_tokens = tokenizer.convert_ids_to_tokens(prev_ids)
             print("Previous ids: {}\nprev_tokens: {}\n".format(prev_ids, prev_tokens))
+            real_next_id = torch.argmax(scores[beam_idx], dim=-1).item()
+            real_score = scores[beam_idx][real_next_id].item()
+            real_next_token = tokenizer.convert_ids_to_tokens(real_next_id)
+            print("Real next id: {}, token: {}, real_score: {}".format(real_next_id, real_next_token, real_score))
             cur_tokens = input_ids[beam_idx][input_length:].tolist()
             if cur_tokens != [] and (cur_tokens[-1] == 2 or cur_tokens.count(eos_token_id) >= 1):
                 continue
@@ -1699,9 +1703,6 @@ class GenerationMixin:
                 valid_mask_list.append([beam_idx, eos_token_id])
             print("\nbeam_idx: {}".format(beam_idx))
             real_next_id = torch.argmax(scores[beam_idx], dim=-1).item()
-            real_score = scores[beam_idx][real_next_id].item()
-            real_next_token = tokenizer.convert_ids_to_tokens(real_next_id)
-            print("Real next id: {}, token: {}, real_score: {}".format(real_next_id, real_next_token, real_score))
             if real_next_id == single_new_line:
                 valid_mask_list.append([beam_idx, slot_delim])
             ## If valid mask is not empty or we're forcing a slot question, mask vocab!
