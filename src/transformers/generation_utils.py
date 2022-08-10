@@ -1707,11 +1707,11 @@ class GenerationMixin:
             ## If valid mask is not empty or we're forcing a slot question, mask vocab!
             if valid_mask_list or forced_slot[beam_idx]:
                 scores = self.mask_vocab(scores, beam_idx, valid_mask_list)
-            ## If there's something in the mask list, make sure to mask everything else
-            constrained_next_id = torch.argmax(scores[beam_idx], dim=-1).item()
-            constrained_score = scores[beam_idx][constrained_next_id].item()
-            constrained_next_token = tokenizer.convert_ids_to_tokens(constrained_next_id)
-            print("Constrained next id: {}, token: {}, score: {}".format(constrained_next_id, constrained_next_token, constrained_score))
+                ## If there's something in the mask list, make sure to mask everything else
+                constrained_next_id = torch.argmax(scores[beam_idx], dim=-1).item()
+                constrained_score = scores[beam_idx][constrained_next_id].item()
+                constrained_next_token = tokenizer.convert_ids_to_tokens(constrained_next_id)
+                print("Constrained next id: {}, token: {}, score: {}".format(constrained_next_id, constrained_next_token, constrained_score))
             else:
                 print("No constraints in place.")
         import pdb; pdb.set_trace()
