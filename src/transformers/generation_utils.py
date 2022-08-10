@@ -1588,8 +1588,6 @@ class GenerationMixin:
         ## If there are no valid candidates, throw an error
         if valid_mask_list == []:
             scores[beam_idx] = -float("inf")
-            print("No valid candidates!")
-            import pdb; pdb.set_trace()
         else:
             valid_mask = torch.LongTensor(valid_mask_list)
             indices = torch.ones(len(valid_mask))
