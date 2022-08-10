@@ -1605,7 +1605,7 @@ class GenerationMixin:
             if cur_tokens != [] and (cur_tokens[-1] == 2 or cur_tokens.count(eos_token_id) >= 1):
                 continue
             ## Check for answer start phrase, which will come when a slot question is finished
-            answer_start_idx, cur_tokens_temp = -1, cur_tokens
+            answer_start_idx, cur_tokens_temp = -1, cur_tokens 
             while len(cur_tokens_temp) > len(answer_start_delim):
                 if cur_tokens_temp[-len(answer_start_delim):] == answer_start_delim:
                     ## If cur_tokens_temp ends with minor delimiter, we found it!
