@@ -1773,9 +1773,6 @@ class GenerationMixin:
             ## At this point, we know that a slot delimiter has been generated
             ## To track the slot delimiter index, count number of slot delimiters found in what's been generated so far
             forced_slot[beam_idx] = cur_tokens.count(slot_delim) + 1
-            ## If we've finished generating all constraints, set to zero so we can generate EOS and be done!
-            if forced_slot[beam_idx] > len(slot_constraints):
-                forced_slot[beam_idx] = 0
             cur_slots[beam_idx] = cur_tokens[slot_delim_idx:]
             ## If answer start delimiter has been found more recently than the slot delimiter,
             ## force generation of answers for the current slot
@@ -1799,7 +1796,10 @@ class GenerationMixin:
                     print("Duplicate beam at beam_idx {}, mask everything".format(beam_idx))
                     scores = self.mask_vocab(scores, beam_idx, valid_mask_list)
                     continue
-            if forced_answer[beam_idx]:
+            if forced_slot[beam_idx] > len(slot_constraints):
+                ## If we've generated all the slot constraints needed, only allow EOS
+                valid_mask_list.append([beam_idx, eos_token_id])
+            elif forced_answer[beam_idx]:
                 ## Finds all previous candidates in the context
                 used_context = [0 for i in range(len(context))]
                 ## Allow a max of 5 answers per question
@@ -1870,9 +1870,6 @@ class GenerationMixin:
                     else:
                         print("ERROR, check what went wrong!")
                         import pdb; pdb.set_trace()
-            else:
-                valid_mask_list.append([beam_idx, eos_token_id])
-            
             #if forced_answer[beam_idx]:
             if True:
                 prev_ids = input_ids[beam_idx][input_length:].tolist()
@@ -1936,9 +1933,6 @@ class GenerationMixin:
             ## At this point, we know that a slot delimiter has been generated
             ## To track the slot delimiter index, count number of slot delimiters found in what's been generated so far
             forced_slot[beam_idx] = cur_tokens.count(slot_delim) + 1
-            ## If we've finished generating all constraints, set to zero so we can generate EOS and be done!
-            if forced_slot[beam_idx] > len(slot_constraints):
-                forced_slot[beam_idx] = 0
             cur_slots[beam_idx] = cur_tokens[slot_delim_idx:]
             ## If answer start delimiter has been found more recently than the slot delimiter,
             ## force generation of answers for the current slot
@@ -1962,7 +1956,10 @@ class GenerationMixin:
                     print("Duplicate beam at beam_idx {}, mask everything".format(beam_idx))
                     scores = self.mask_vocab(scores, beam_idx, valid_mask_list)
                     continue
-            if forced_answer[beam_idx]:
+            if forced_slot[beam_idx] > len(slot_constraints):
+                ## If we've generated all the slot constraints needed, only allow EOS
+                valid_mask_list.append([beam_idx, eos_token_id])
+            elif forced_answer[beam_idx]:
                 ## Remove previously generated candidates from the list of valid candidates
                 cur_valid_candidates = list(valid_candidates)
                 #print("intial cur_valid_candidates: {}".format(cur_valid_candidates))
@@ -2024,8 +2021,6 @@ class GenerationMixin:
                     else:
                         print("ERROR, check what went wrong!")
                         import pdb; pdb.set_trace()
-            else:
-                valid_mask_list.append([beam_idx, eos_token_id])
         
             #if forced_answer[beam_idx]:
             if True:
