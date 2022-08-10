@@ -1719,8 +1719,6 @@ class GenerationMixin:
             real_score = scores[beam_idx][real_next_id].item()
             real_next_token = tokenizer.convert_ids_to_tokens(real_next_id)
             print("Real next id: {}, token: {}, real_score: {}".format(real_next_id, real_next_token, real_score))
-            if real_next_id == single_new_line:
-                valid_mask_list.append([beam_idx, slot_delim])
             ## If valid mask is not empty or we're forcing a slot question, mask vocab!
             if valid_mask_list or forced_slot[beam_idx]:
                 scores = self.mask_vocab(scores, beam_idx, valid_mask_list)
