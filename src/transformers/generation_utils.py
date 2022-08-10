@@ -1686,7 +1686,7 @@ class GenerationMixin:
                     if constraint[:len(cur_slot)] != cur_slot:
                         ## If a constraint hasn't been correctly generated, there are no valid next tokens!
                         valid_mask_list = []
-                    if len(constraint) > len(cur_slot):
+                    elif len(constraint) > len(cur_slot):
                         ## If slot constraint is unfinished, only allow model to generate next step
                         valid_mask_list.append([beam_idx, constraint[len(cur_slot)]])
                     elif len(constraint) == len(cur_slot):
