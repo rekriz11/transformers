@@ -1884,9 +1884,9 @@ class GenerationMixin:
                 constrained_score = scores[beam_idx][constrained_next_id].item()
                 constrained_next_token = tokenizer.convert_ids_to_tokens(constrained_next_id)
                 print("Constrained next id: {}, token: {}, score: {}".format(constrained_next_id, constrained_next_token, constrained_score))
-                import pdb; pdb.set_trace()
             else:
                 scores = self.mask_vocab(scores, beam_idx, valid_mask_list)
+        import pdb; pdb.set_trace()
         return scores
 
     ## Added constrained generation helper to only allow generation from valid candidates
@@ -2037,9 +2037,9 @@ class GenerationMixin:
                 constrained_score = scores[beam_idx][constrained_next_id].item()
                 constrained_next_token = tokenizer.convert_ids_to_tokens(constrained_next_id)
                 print("Constrained next id: {}, token: {}, score: {}".format(constrained_next_id, constrained_next_token, constrained_score))
-                import pdb; pdb.set_trace()
             else:
                 scores = self.mask_vocab(scores, beam_idx, valid_mask_list)
+        import pdb; pdb.set_trace()
         return scores
 
     def greedy_search(
