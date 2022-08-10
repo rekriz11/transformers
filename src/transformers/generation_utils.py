@@ -1662,10 +1662,10 @@ class GenerationMixin:
             if unconstrained_answer[beam_idx]:
                 if len(prev_answer) >= 5 or cur_answer == [empty_answer]:
                     ## Allow a max of 5 answers per question, and force the model to move on after outputting empty answer
-                    valid_mask_list.append([beam_idx, slot_delim])
+                    valid_mask_list = [[beam_idx, slot_delim]]
                 elif len(cur_answer) >= 8:
                     ## Force the model to end the answer if it's 10 subwords long
-                    valid_mask_list.append([beam_idx, answer_delim])
+                    valid_mask_list = [[beam_idx, answer_delim]]
             elif forced_slot[beam_idx]:
                 ## Subtract one from index to start at 0
                 constraint = slot_constraints[forced_slot[beam_idx]-1]
@@ -1675,12 +1675,11 @@ class GenerationMixin:
                 else:
                     ## Check if slot constraint has been correctly generated so far
                     if constraint[:len(cur_slot)] != cur_slot:
+                        ## If a constraint hasn't been correctly generated, there are no valid next tokens!
                         valid_mask_list = []
-                        print("ERROR generating slot constraint!!")
-                        import pdb; pdb.set_trace()
                     if len(constraint) > len(cur_slot):
                         ## If slot constraint is unfinished, only allow model to generate next step
-                        valid_mask_list = [[beam_idx, constraint[len(cur_slot)]]]
+                        valid_mask_list.append([beam_idx, constraint[len(cur_slot)]])
                     elif len(constraint) == len(cur_slot):
                         ## If slot candidate is finished, allow model to generate any input subword (and unknown answer)
                         ## NOTE: SHOULD NEVER GET HERE, THROW AN ERROR
@@ -1695,27 +1694,30 @@ class GenerationMixin:
             else:
                 valid_mask_list.append([beam_idx, eos_token_id])
 
-        #prev_ids = input_ids[0][input_length:].tolist()
-        #prev_tokens = tokenizer.convert_ids_to_tokens(prev_ids)
-        #print("Previous ids: {}\nprev_tokens: {}\n".format(prev_ids, prev_tokens))
-        #real_next_id = torch.argmax(scores, dim=-1).item()
-        #real_score = scores[0][real_next_id].item()
-        #real_next_token = tokenizer.convert_ids_to_tokens(real_next_id)
-        #print("Real next id: {}, token: {}, real_score: {}".format(real_next_id, real_next_token, real_score))
-        #if real_next_id == single_new_line:
-        #    valid_mask_list.append([beam_idx, slot_delim])
+            ## If valid mask is not empty or we're forcing a slot question, mask vocab!
+            if valid_mask_list or forced_slot[beam_idx]:
+                scores = self.mask_vocab(scores, beam_idx, valid_mask_list)
+
+        '''prev_ids = input_ids[0][input_length:].tolist()
+        prev_tokens = tokenizer.convert_ids_to_tokens(prev_ids)
+        print("Previous ids: {}\nprev_tokens: {}\n".format(prev_ids, prev_tokens))
+        real_next_id = torch.argmax(scores, dim=-1).item()
+        real_score = scores[0][real_next_id].item()
+        real_next_token = tokenizer.convert_ids_to_tokens(real_next_id)
+        print("Real next id: {}, token: {}, real_score: {}".format(real_next_id, real_next_token, real_score))
+        if real_next_id == single_new_line:
+            valid_mask_list.append([beam_idx, slot_delim])
         ## If there's something in the mask list, make sure to mask everything else
-        if valid_mask_list:
-            scores = self.mask_vocab(scores, beam_idx, valid_mask_list)
-            #constrained_next_id = torch.argmax(scores, dim=-1).item()
-            #constrained_score = scores[0][constrained_next_id].item()
-            #constrained_next_token = tokenizer.convert_ids_to_tokens(constrained_next_id)
-            #print("Constrained next id: {}, token: {}, score: {}".format(constrained_next_id, constrained_next_token, constrained_score))
-            #if real_next_id != constrained_next_id:
-            #    print("Not the same!")
-            #    import pdb; pdb.set_trace()
-        #else:
-        #    print("No constraints in place")
+        
+            constrained_next_id = torch.argmax(scores, dim=-1).item()
+            constrained_score = scores[0][constrained_next_id].item()
+            constrained_next_token = tokenizer.convert_ids_to_tokens(constrained_next_id)
+            print("Constrained next id: {}, token: {}, score: {}".format(constrained_next_id, constrained_next_token, constrained_score))
+            if real_next_id != constrained_next_id:
+                print("Not the same!")
+                import pdb; pdb.set_trace()
+        else:
+            print("No constraints in place")'''
         return scores
 
     ## Added constrained generation helper to only allow generation from the input
@@ -1837,8 +1839,6 @@ class GenerationMixin:
                     ## Check if slot constraint has been correctly generated so far
                     if constraint[:len(cur_slot)] != cur_slot:
                         valid_mask_list = []
-                        print("ERROR generating slot constraint!!")
-                        import pdb; pdb.set_trace()
                     if len(constraint) > len(cur_slot):
                         ## If slot constraint is unfinished, only allow model to generate next step
                         valid_mask_list = [[beam_idx, constraint[len(cur_slot)]]]
@@ -1852,6 +1852,7 @@ class GenerationMixin:
                         import pdb; pdb.set_trace()
             else:
                 valid_mask_list.append([beam_idx, eos_token_id])
+            scores = self.mask_vocab(scores, beam_idx, valid_mask_list)
         
         #if forced_answer[0]:
         '''if True:
@@ -1877,7 +1878,6 @@ class GenerationMixin:
             print("Constrained top 10:\n{}\n".format("\n".join([str((cids[i], ctokens[i], cscores[i])) for i in range(len(cscores)) if cscores[i] != -math.inf])))
             import pdb; pdb.set_trace()
         else:'''
-        scores = self.mask_vocab(scores, beam_idx, valid_mask_list)
         return scores
 
     ## Added constrained generation helper to only allow generation from valid candidates
