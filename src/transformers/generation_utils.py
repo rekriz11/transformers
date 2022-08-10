@@ -2023,8 +2023,6 @@ class GenerationMixin:
                     ## Check if slot constraint has been correctly generated so far
                     if constraint[:len(cur_slot)] != cur_slot:
                         valid_mask_list = []
-                        print("ERROR generating slot constraint!!")
-                        import pdb; pdb.set_trace()
                     elif len(constraint) > len(cur_slot):
                         ## If slot constraint is unfinished, only allow model to generate next step
                         valid_mask_list = [[beam_idx, constraint[len(cur_slot)]]]
