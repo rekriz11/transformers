@@ -1686,6 +1686,13 @@ class GenerationMixin:
                 if real_next_id == single_new_line:
                     ## IF the most likely next token is a single new line, only allow the slot delim (to ensure proper formatting of Q/A pairs)
                     valid_mask_list = [[beam_idx, slot_delim]]
+                else:
+                    ## Otherwise, always mask the single new line to prevent evaluation issues
+                    mask_newline = torch.LongTensor([[beam_idx, single_new_line]])
+                    indices = torch.ones(len(mask_newline))
+                    mask_newline = torch.sparse.LongTensor(mask_newline.t(), \
+                        indices, scores.size()).to(scores.device).to_dense().bool()
+                    scores[beam_idx] = scores[beam_idx].masked_fill(mask_newline[beam_idx], -float("inf"))
             elif forced_slot[beam_idx]:
                 ## Subtract one from index to start at 0
                 constraint = slot_constraints[forced_slot[beam_idx]-1]
