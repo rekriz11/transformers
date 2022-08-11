@@ -1715,24 +1715,24 @@ class GenerationMixin:
                     else:
                         print("ERROR, check what went wrong!")
                         import pdb; pdb.set_trace()
-            print("\nbeam_idx: {}".format(beam_idx))
+            '''print("\nbeam_idx: {}".format(beam_idx))
             prev_ids = input_ids[beam_idx][input_length:].tolist()
             prev_tokens = tokenizer.convert_ids_to_tokens(prev_ids)
             print("Previous ids: {}\nprev_tokens: {}\n".format(prev_ids, prev_tokens))
             real_next_id = torch.argmax(scores[beam_idx], dim=-1).item()
             real_score = scores[beam_idx][real_next_id].item()
             real_next_token = tokenizer.convert_ids_to_tokens(real_next_id)
-            print("Real next id: {}, token: {}, real_score: {}".format(real_next_id, real_next_token, real_score))
+            print("Real next id: {}, token: {}, real_score: {}".format(real_next_id, real_next_token, real_score))'''
             ## If valid mask is not empty or we're forcing a slot question, mask vocab!
             if valid_mask_list or not unconstrained_answer[beam_idx]:
                 scores = self.mask_vocab(scores, beam_idx, valid_mask_list)                
-                constrained_next_id = torch.argmax(scores[beam_idx], dim=-1).item()
+                '''constrained_next_id = torch.argmax(scores[beam_idx], dim=-1).item()
                 constrained_score = scores[beam_idx][constrained_next_id].item()
                 constrained_next_token = tokenizer.convert_ids_to_tokens(constrained_next_id)
-                print("Constrained next id: {}, token: {}, score: {}".format(constrained_next_id, constrained_next_token, constrained_score))
-            else:
-                print("No constraints in place.")
-        import pdb; pdb.set_trace()
+                print("Constrained next id: {}, token: {}, score: {}".format(constrained_next_id, constrained_next_token, constrained_score))'''
+            #else:
+            #    print("No constraints in place.")
+        #import pdb; pdb.set_trace()
         return scores
 
     ## Added constrained generation helper to only allow generation from the input
