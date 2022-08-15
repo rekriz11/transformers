@@ -2928,7 +2928,7 @@ class GenerationMixin:
             next_token_scores = next_token_scores_processed + beam_scores[:, None].expand_as(next_token_scores)
             next_token_scores = logits_warper(input_ids, next_token_scores)
             if constrained_type != None and 'entity_input' in constrained_type:
-                #print("\n##### STEP {} #####".format(cur_len))
+                print("\n##### STEP {} #####".format(cur_len))
                 next_token_scores = self.set_scores_to_inf_for_invalid_inputs(next_token_scores, input_ids, disjoint_entities, valid_input, empty_answer, delimiters, eos_token_id, constrained_type, tokenizer)
 
             # Store scores, attentions and hidden_states when required
@@ -2957,6 +2957,8 @@ class GenerationMixin:
 
             next_tokens = torch.multinomial(probs, num_samples=2 * num_beams)
             next_token_scores = torch.gather(next_token_scores, -1, next_tokens)
+            print("next_tokens: {}".format(next_tokens))
+            import pdb; pdb.set_trace
 
             next_token_scores, _indices = torch.sort(next_token_scores, descending=True, dim=1)
             next_tokens = torch.gather(next_tokens, -1, _indices)
