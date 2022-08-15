@@ -1625,6 +1625,7 @@ class GenerationMixin:
         #print("\n\ninput_ids: {}\nforce_entity: {}\ncur_entities: {}\nforce_input: {}\ncur_input: {}\ndelimiters: {}\nempty answer: {}\n".format(input_ids, force_entity, \
         #    cur_entities, force_input, cur_input, delimiters, empty_answer))
         for beam_idx, (cur_ent, cur_inp) in enumerate(zip(cur_entities, cur_input)):
+            cur_tokens = input_ids[beam_idx].tolist()
             ## If EOS has appeared, stop masking
             if cur_tokens.count(eos_token_id) >= 1:
                 print("Idx {}, no more masking needed, scores: {}".format(beam_idx))
@@ -1714,7 +1715,7 @@ class GenerationMixin:
             #print("Constrained top 5:\n{}\n".format("\n".join([str((cids[i], ctokens[i], cscores[i])) for i in range(len(cscores)) if cscores[i] != -math.inf])))
             #else:
             #    scores = self.mask_vocab(scores, beam_idx, valid_mask_list)
-            import pdb; pdb.set_trace()
+        import pdb; pdb.set_trace()
         return scores
 
     '''
