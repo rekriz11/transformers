@@ -1128,7 +1128,7 @@ class GenerationMixin:
         >>> tokenizer.batch_decode(outputs, skip_special_tokens=True)
         ['Paris ist eines der dichtesten besiedelten Gebiete Europas.']
         ```"""
-        print("Num_beams: {}".format(num_beams))
+        print("#########\nNum_beams: {}\n############".format(num_beams))
         import pdb; pdb.set_trace()
         # 1. Set generation parameters if not already defined
         bos_token_id = bos_token_id if bos_token_id is not None else self.config.bos_token_id
