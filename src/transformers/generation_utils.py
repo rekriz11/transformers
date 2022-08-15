@@ -1579,7 +1579,6 @@ class GenerationMixin:
             ## Avoids masking all valid tokens, masks all others
             valid_mask = ~(torch.sparse.LongTensor(valid_mask.t(), \
                 indices, scores.size()).to(scores.device).to_dense().bool())
-            import pdb; pdb.set_trace()
             scores[beam_idx] = scores[beam_idx].masked_fill(valid_mask[beam_idx], -float("inf"))
         return scores
 
