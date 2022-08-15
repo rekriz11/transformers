@@ -1628,7 +1628,7 @@ class GenerationMixin:
             cur_tokens = input_ids[beam_idx].tolist()
             ## If EOS has appeared, stop masking
             if cur_tokens.count(eos_token_id) >= 1:
-                print("Idx {}, no more masking needed, scores: {}".format(beam_idx))
+                print("Idx {}, no more masking needed.".format(beam_idx))
                 continue
             valid_mask_list = []
             if force_entity[beam_idx]:
