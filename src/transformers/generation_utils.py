@@ -1700,6 +1700,7 @@ class GenerationMixin:
             real_next_token = tokenizer.convert_ids_to_tokens(real_next_id)
             print("Real next id: {}, token: {}, real_score: {}".format(real_next_id, real_next_token, real_score))
             rscores, rids = torch.topk(scores[beam_idx], 5, dim=-1, largest=True, sorted=True)
+            import pdb; pdb.set_trace()
             rscores, rids = [s.item() for s in rscores[0]], [i.item() for i in rids[0]]
             rtokens = tokenizer.convert_ids_to_tokens(rids)
             print("Original top 5:\n{}\n".format("\n".join([str((rids[i], rtokens[i], rscores[i])) for i in range(len(rscores))])))
