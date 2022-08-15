@@ -1589,7 +1589,8 @@ class GenerationMixin:
         force_input, cur_input = [0 for i in range(scores.shape[0])], [[] for i in range(scores.shape[0])]
         for beam_idx in range(scores.shape[0]):
             cur_tokens = input_ids[beam_idx].tolist()
-            if len(cur_tokens) > 1 and (cur_tokens[-1] == eos_token_id or cur_tokens.count(eos_token_id) >= 1):
+            if cur_tokens.count(eos_token_id) >= 1:
+                print("Idx {}, EOS_TOKEN found".format(beam_idx))
                 continue
             ## Check for delimiter splitting entities
             try:
@@ -1625,8 +1626,8 @@ class GenerationMixin:
         #    cur_entities, force_input, cur_input, delimiters, empty_answer))
         for beam_idx, (cur_ent, cur_inp) in enumerate(zip(cur_entities, cur_input)):
             ## If EOS has appeared, stop masking
-            if len(cur_tokens) > 1 and cur_tokens.count(eos_token_id) >= 1:
-                print("No more masking needed for idx {}, scores: {}".format(beam_idx, scores[beam_idx]))
+            if cur_tokens.count(eos_token_id) >= 1:
+                print("Idx {}, no more masking needed, scores: {}".format(beam_idx))
                 continue
             valid_mask_list = []
             if force_entity[beam_idx]:
