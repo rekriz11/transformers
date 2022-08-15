@@ -1699,7 +1699,7 @@ class GenerationMixin:
             real_score = scores[beam_idx][real_next_id].item()
             real_next_token = tokenizer.convert_ids_to_tokens(real_next_id)
             print("Real next id: {}, token: {}, real_score: {}".format(real_next_id, real_next_token, real_score))
-            rscores, rids = torch.topk(scores[beam_idx], 5, dim=1, largest=True, sorted=True)
+            rscores, rids = torch.topk(scores[beam_idx], 5, dim=-1, largest=True, sorted=True)
             rscores, rids = [s.item() for s in rscores[0]], [i.item() for i in rids[0]]
             rtokens = tokenizer.convert_ids_to_tokens(rids)
             print("Original top 5:\n{}\n".format("\n".join([str((rids[i], rtokens[i], rscores[i])) for i in range(len(rscores))])))
@@ -1708,7 +1708,7 @@ class GenerationMixin:
             constrained_score = scores[beam_idx][constrained_next_id].item()
             constrained_next_token = tokenizer.convert_ids_to_tokens(constrained_next_id)
             print("Constrained next id: {}, token: {}, score: {}".format(constrained_next_id, constrained_next_token, constrained_score))
-            cscores, cids = torch.topk(scores[beam_idx], 5, dim=1, largest=True, sorted=True)
+            cscores, cids = torch.topk(scores[beam_idx], 5, dim=-1, largest=True, sorted=True)
             cscores, cids = [s.item() for s in cscores[0]], [i.item() for i in cids[0]]
             ctokens = tokenizer.convert_ids_to_tokens(cids)
             print("Constrained top 5:\n{}\n".format("\n".join([str((cids[i], ctokens[i], cscores[i])) for i in range(len(cscores)) if cscores[i] != -math.inf])))
