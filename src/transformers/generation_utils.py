@@ -1699,19 +1699,19 @@ class GenerationMixin:
             real_score = scores[beam_idx][real_next_id].item()
             real_next_token = tokenizer.convert_ids_to_tokens(real_next_id)
             print("Real next id: {}, token: {}, real_score: {}".format(real_next_id, real_next_token, real_score))
-            rscores, rids = torch.topk(scores[beam_idx], 5, dim=-1, largest=True, sorted=True)
-            rscores, rids = [s.item() for s in rscores], [i.item() for i in rids]
-            rtokens = tokenizer.convert_ids_to_tokens(rids)
-            print("Original top 5:\n{}\n".format("\n".join([str((rids[i], rtokens[i], rscores[i])) for i in range(len(rscores))])))
+            #rscores, rids = torch.topk(scores[beam_idx], 5, dim=-1, largest=True, sorted=True)
+            #rscores, rids = [s.item() for s in rscores], [i.item() for i in rids]
+            #rtokens = tokenizer.convert_ids_to_tokens(rids)
+            #print("Original top 5:\n{}\n".format("\n".join([str((rids[i], rtokens[i], rscores[i])) for i in range(len(rscores))])))
             scores = self.mask_vocab(scores, beam_idx, valid_mask_list)
             constrained_next_id = torch.argmax(scores[beam_idx], dim=-1).item()
             constrained_score = scores[beam_idx][constrained_next_id].item()
             constrained_next_token = tokenizer.convert_ids_to_tokens(constrained_next_id)
             print("Constrained next id: {}, token: {}, score: {}".format(constrained_next_id, constrained_next_token, constrained_score))
-            cscores, cids = torch.topk(scores[beam_idx], 5, dim=-1, largest=True, sorted=True)
-            cscores, cids = [s.item() for s in cscores], [i.item() for i in cids]
-            ctokens = tokenizer.convert_ids_to_tokens(cids)
-            print("Constrained top 5:\n{}\n".format("\n".join([str((cids[i], ctokens[i], cscores[i])) for i in range(len(cscores)) if cscores[i] != -math.inf])))
+            #cscores, cids = torch.topk(scores[beam_idx], 5, dim=-1, largest=True, sorted=True)
+            #cscores, cids = [s.item() for s in cscores], [i.item() for i in cids]
+            #ctokens = tokenizer.convert_ids_to_tokens(cids)
+            #print("Constrained top 5:\n{}\n".format("\n".join([str((cids[i], ctokens[i], cscores[i])) for i in range(len(cscores)) if cscores[i] != -math.inf])))
             #else:
             #    scores = self.mask_vocab(scores, beam_idx, valid_mask_list)
         import pdb; pdb.set_trace()
