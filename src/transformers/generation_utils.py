@@ -1162,8 +1162,6 @@ class GenerationMixin:
         return_dict_in_generate = (
             return_dict_in_generate if return_dict_in_generate is not None else self.config.return_dict_in_generate
         )
-        print("output_scores: {}".format(output_scores))
-        print("return_dict_in_generate: {}".format(return_dict_in_generate))
 
         # 2. Define model inputs
         # inputs_tensor has to be defined
