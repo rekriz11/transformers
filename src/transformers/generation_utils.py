@@ -1703,7 +1703,7 @@ class GenerationMixin:
             rscores, rids = [s.item() for s in rscores], [i.item() for i in rids]
             rtokens = tokenizer.convert_ids_to_tokens(rids)
             print("Original top 5:\n{}\n".format("\n".join([str((rids[i], rtokens[i], rscores[i])) for i in range(len(rscores))])))
-            scores = self.mask_vocab(scores, beam_idx, valid_mask_list)
+            scores[beam_idx] = self.mask_vocab(scores[beam_idx], beam_idx, valid_mask_list)
             constrained_next_id = torch.argmax(scores[beam_idx], dim=-1).item()
             constrained_score = scores[beam_idx][constrained_next_id].item()
             constrained_next_token = tokenizer.convert_ids_to_tokens(constrained_next_id)
