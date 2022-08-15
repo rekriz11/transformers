@@ -2930,7 +2930,7 @@ class GenerationMixin:
             next_token_scores = logits_warper(input_ids, next_token_scores)
             if constrained_type != None and 'entity_input' in constrained_type:
                 #print("\n##### STEP {} #####".format(cur_len))
-                next_tokens_scores = self.set_scores_to_inf_for_invalid_inputs(next_tokens_scores, input_ids, disjoint_entities, valid_input, empty_answer, delimiters, eos_token_id, constrained_type, tokenizer)
+                next_token_scores = self.set_scores_to_inf_for_invalid_inputs(next_token_scores, input_ids, disjoint_entities, valid_input, empty_answer, delimiters, eos_token_id, constrained_type, tokenizer)
 
             # Store scores, attentions and hidden_states when required
             if return_dict_in_generate:
