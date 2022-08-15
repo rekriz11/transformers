@@ -1583,7 +1583,7 @@ class GenerationMixin:
         return scores
 
     ## Added constrained generation helper to only allow generation of valid entity types/strings from input text
-    def set_scores_to_inf_for_invalid_inputs(self, scores, input_ids, disjoint_entities, context, empty_answer, delimiters, eos_token_id, tokenizer):
+    def set_scores_to_inf_for_invalid_inputs(self, scores, input_ids, disjoint_entities, context, empty_answer, delimiters, eos_token_id, constraint_type, tokenizer):
         [entity_delim, entity_type_delim] = delimiters
         force_entity, cur_entities = [0 for i in range(scores.shape[0])], [[] for i in range(scores.shape[0])]
         force_input, cur_input = [0 for i in range(scores.shape[0])], [[] for i in range(scores.shape[0])]
@@ -1714,7 +1714,7 @@ class GenerationMixin:
         print("Constrained top 10:\n{}\n".format("\n".join([str((cids[i], ctokens[i], cscores[i])) for i in range(len(cscores)) if cscores[i] != -math.inf])))
         #else:
         #    scores = self.mask_vocab(scores, beam_idx, valid_mask_list)
-        import pdb; pdb.set_trace()
+        #import pdb; pdb.set_trace()
         return scores
 
     '''
@@ -2058,9 +2058,9 @@ class GenerationMixin:
 
             # pre-process distribution
             next_tokens_scores = logits_processor(input_ids, next_token_logits)
-            if constrained_type == 'entity_input':
+            if 'entity_input' in constraint_type:
                 print("\n##### STEP {} #####".format(cur_len))
-                next_tokens_scores = self.set_scores_to_inf_for_invalid_inputs(next_tokens_scores, input_ids, disjoint_entities, valid_input, empty_answer, delimiters, eos_token_id, tokenizer)
+                next_tokens_scores = self.set_scores_to_inf_for_invalid_inputs(next_tokens_scores, input_ids, disjoint_entities, valid_input, empty_answer, delimiters, eos_token_id, constraint_type, tokenizer)
 
             # Store scores, attentions and hidden_states when required
             if return_dict_in_generate:
@@ -2323,6 +2323,9 @@ class GenerationMixin:
             # pre-process distribution
             next_token_scores = logits_processor(input_ids, next_token_logits)
             next_token_scores = logits_warper(input_ids, next_token_scores)
+            if 'entity_input' in constraint_type:
+                print("\n##### STEP {} #####".format(cur_len))
+                next_tokens_scores = self.set_scores_to_inf_for_invalid_inputs(next_tokens_scores, input_ids, disjoint_entities, valid_input, empty_answer, delimiters, eos_token_id, constraint_type, tokenizer)
 
             # Store scores, attentions and hidden_states when required
             if return_dict_in_generate:
@@ -2345,6 +2348,9 @@ class GenerationMixin:
             # sample
             probs = nn.functional.softmax(next_token_scores, dim=-1)
             next_tokens = torch.multinomial(probs, num_samples=1).squeeze(1)
+            if 'entity_input' in constraint_type:
+                print("next_tokens: {}".format(next_tokens))
+                import pdb; pdb.set_trace()
 
             # finished sentences should have their next token be a padding token
             if eos_token_id is not None:
