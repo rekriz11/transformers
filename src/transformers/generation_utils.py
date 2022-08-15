@@ -1693,11 +1693,11 @@ class GenerationMixin:
                             #print("END OF SEQUENCE found, not top candidate but not found higher...\ntokens: {}, valid_mask_list: {}".format(tokens[beam_idx], valid_mask_list))
             prev_ids = input_ids[beam_idx].tolist()
             prev_tokens = tokenizer.convert_ids_to_tokens(prev_ids)
-            print("beam_idx {} Previous ids: {}\nprev_tokens: {}\n".format(beam_idx, prev_ids, prev_tokens))
+            print("\nbeam_idx {} Previous ids: {}\nprev_tokens: {}".format(beam_idx, prev_ids, prev_tokens))
             real_next_id = torch.argmax(scores[beam_idx], dim=-1).item()
             real_score = scores[beam_idx][real_next_id].item()
             real_next_token = tokenizer.convert_ids_to_tokens(real_next_id)
-            print("beam_idx {} Real next id: {}, token: {}, real_score: {}".format(beam_idx, real_next_id, real_next_token, real_score))
+            print("Real next id: {}, token: {}, real_score: {}".format(real_next_id, real_next_token, real_score))
             #rscores, rids = torch.topk(scores[beam_idx], 10, dim=1, largest=True, sorted=True)
             #rscores, rids = [s.item() for s in rscores[0]], [i.item() for i in rids[0]]
             #rtokens = tokenizer.convert_ids_to_tokens(rids)
@@ -1706,7 +1706,7 @@ class GenerationMixin:
             constrained_next_id = torch.argmax(scores[beam_idx], dim=-1).item()
             constrained_score = scores[beam_idx][constrained_next_id].item()
             constrained_next_token = tokenizer.convert_ids_to_tokens(constrained_next_id)
-            print("beam_idx {} Constrained next id: {}, token: {}, score: {}".format(beam_idx, constrained_next_id, constrained_next_token, constrained_score))
+            print("Constrained next id: {}, token: {}, score: {}".format(constrained_next_id, constrained_next_token, constrained_score))
             #cscores, cids = torch.topk(scores, 5, dim=1, largest=True, sorted=True)
             #cscores, cids = [s.item() for s in cscores[0]], [i.item() for i in cids[0]]
             #ctokens = tokenizer.convert_ids_to_tokens(cids)
