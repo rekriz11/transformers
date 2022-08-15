@@ -2058,7 +2058,7 @@ class GenerationMixin:
 
             # pre-process distribution
             next_tokens_scores = logits_processor(input_ids, next_token_logits)
-            if 'entity_input' in constrained_type:
+            if constrained_type != None and 'entity_input' in constrained_type:
                 print("\n##### STEP {} #####".format(cur_len))
                 next_tokens_scores = self.set_scores_to_inf_for_invalid_inputs(next_tokens_scores, input_ids, disjoint_entities, valid_input, empty_answer, delimiters, eos_token_id, constrained_type, tokenizer)
 
@@ -2323,7 +2323,7 @@ class GenerationMixin:
             # pre-process distribution
             next_token_scores = logits_processor(input_ids, next_token_logits)
             next_token_scores = logits_warper(input_ids, next_token_scores)
-            if 'entity_input' in constrained_type:
+            if constrained_type != None and 'entity_input' in constrained_type:
                 print("\n##### STEP {} #####".format(cur_len))
                 next_tokens_scores = self.set_scores_to_inf_for_invalid_inputs(next_tokens_scores, input_ids, disjoint_entities, valid_input, empty_answer, delimiters, eos_token_id, constrained_type, tokenizer)
 
@@ -2348,9 +2348,6 @@ class GenerationMixin:
             # sample
             probs = nn.functional.softmax(next_token_scores, dim=-1)
             next_tokens = torch.multinomial(probs, num_samples=1).squeeze(1)
-            if 'entity_input' in constrained_type:
-                print("next_tokens: {}".format(next_tokens))
-                import pdb; pdb.set_trace()
 
             # finished sentences should have their next token be a padding token
             if eos_token_id is not None:
@@ -2607,7 +2604,7 @@ class GenerationMixin:
 
             next_token_scores_processed = logits_processor(input_ids, next_token_scores)
             next_token_scores = next_token_scores_processed + beam_scores[:, None].expand_as(next_token_scores)
-            if 'entity_input' in constrained_type:
+            if constrained_type != None and 'entity_input' in constrained_type:
                 print("\n##### STEP {} #####".format(cur_len))
                 next_token_scores = self.set_scores_to_inf_for_invalid_inputs(next_token_scores, input_ids, disjoint_entities, valid_input, empty_answer, delimiters, eos_token_id, constrained_type, tokenizer)
 
@@ -2931,7 +2928,7 @@ class GenerationMixin:
             next_token_scores_processed = logits_processor(input_ids, next_token_scores)
             next_token_scores = next_token_scores_processed + beam_scores[:, None].expand_as(next_token_scores)
             next_token_scores = logits_warper(input_ids, next_token_scores)
-            if 'entity_input' in constrained_type:
+            if constrained_type != None and 'entity_input' in constrained_type:
                 print("\n##### STEP {} #####".format(cur_len))
                 next_tokens_scores = self.set_scores_to_inf_for_invalid_inputs(next_tokens_scores, input_ids, disjoint_entities, valid_input, empty_answer, delimiters, eos_token_id, constrained_type, tokenizer)
 
