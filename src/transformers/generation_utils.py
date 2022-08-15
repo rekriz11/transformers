@@ -1714,7 +1714,7 @@ class GenerationMixin:
             #print("Constrained top 5:\n{}\n".format("\n".join([str((cids[i], ctokens[i], cscores[i])) for i in range(len(cscores)) if cscores[i] != -math.inf])))
             #else:
             #    scores = self.mask_vocab(scores, beam_idx, valid_mask_list)
-        import pdb; pdb.set_trace()
+            import pdb; pdb.set_trace()
         return scores
 
     '''
