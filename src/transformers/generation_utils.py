@@ -1981,7 +1981,6 @@ class GenerationMixin:
                 ## If we've generated all the slot constraints needed, only allow EOS
                 valid_mask_list.append([beam_idx, eos_token_id])
             elif forced_answer[beam_idx]:
-                import pdb; pdb.set_trace()
                 ## Remove previously generated candidates from the list of valid candidates
                 cur_valid_candidates = list(valid_candidates)
                 #print("intial cur_valid_candidates: {}".format(cur_valid_candidates))
