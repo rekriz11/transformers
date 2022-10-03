@@ -1590,7 +1590,7 @@ class GenerationMixin:
         for beam_idx in range(scores.shape[0]):
             cur_tokens = input_ids[beam_idx].tolist()
             if cur_tokens.count(eos_token_id) >= 1:
-                print("Idx {}, EOS_TOKEN found".format(beam_idx))
+                #print("Idx {}, EOS_TOKEN found".format(beam_idx))
                 continue
             ## Check for delimiter splitting entities
             try:
@@ -1628,7 +1628,7 @@ class GenerationMixin:
             cur_tokens = input_ids[beam_idx].tolist()
             ## If EOS has appeared, stop masking
             if cur_tokens.count(eos_token_id) >= 1:
-                print("Idx {}, no more masking needed.".format(beam_idx))
+                #print("Idx {}, no more masking needed.".format(beam_idx))
                 continue
             valid_mask_list = []
             if force_entity[beam_idx]:
@@ -1695,11 +1695,11 @@ class GenerationMixin:
                             #print("END OF SEQUENCE found, not top candidate but not found higher...\ntokens: {}, valid_mask_list: {}".format(tokens[beam_idx], valid_mask_list))
             prev_ids = input_ids[beam_idx].tolist()
             prev_tokens = tokenizer.convert_ids_to_tokens(prev_ids)
-            print("\nbeam_idx {} Previous ids: {}\nprev_tokens: {}".format(beam_idx, prev_ids, prev_tokens))
+            #print("\nbeam_idx {} Previous ids: {}\nprev_tokens: {}".format(beam_idx, prev_ids, prev_tokens))
             real_next_id = torch.argmax(scores[beam_idx], dim=-1).item()
             real_score = scores[beam_idx][real_next_id].item()
             real_next_token = tokenizer.convert_ids_to_tokens(real_next_id)
-            print("Real next id: {}, token: {}, real_score: {}".format(real_next_id, real_next_token, real_score))
+            #print("Real next id: {}, token: {}, real_score: {}".format(real_next_id, real_next_token, real_score))
             #rscores, rids = torch.topk(scores[beam_idx], 5, dim=-1, largest=True, sorted=True)
             #rscores, rids = [s.item() for s in rscores], [i.item() for i in rids]
             #rtokens = tokenizer.convert_ids_to_tokens(rids)
@@ -1708,14 +1708,14 @@ class GenerationMixin:
             constrained_next_id = torch.argmax(scores[beam_idx], dim=-1).item()
             constrained_score = scores[beam_idx][constrained_next_id].item()
             constrained_next_token = tokenizer.convert_ids_to_tokens(constrained_next_id)
-            print("Constrained next id: {}, token: {}, score: {}".format(constrained_next_id, constrained_next_token, constrained_score))
+            #print("Constrained next id: {}, token: {}, score: {}".format(constrained_next_id, constrained_next_token, constrained_score))
             #cscores, cids = torch.topk(scores[beam_idx], 5, dim=-1, largest=True, sorted=True)
             #cscores, cids = [s.item() for s in cscores], [i.item() for i in cids]
             #ctokens = tokenizer.convert_ids_to_tokens(cids)
             #print("Constrained top 5:\n{}\n".format("\n".join([str((cids[i], ctokens[i], cscores[i])) for i in range(len(cscores)) if cscores[i] != -math.inf])))
             #else:
             #    scores = self.mask_vocab(scores, beam_idx, valid_mask_list)
-        import pdb; pdb.set_trace()
+        #import pdb; pdb.set_trace()
         return scores
 
     '''
@@ -2930,7 +2930,7 @@ class GenerationMixin:
             next_token_scores = next_token_scores_processed + beam_scores[:, None].expand_as(next_token_scores)
             next_token_scores = logits_warper(input_ids, next_token_scores)
             if constrained_type != None and 'entity_input' in constrained_type:
-                print("\n##### STEP {} #####".format(cur_len))
+                #print("\n##### STEP {} #####".format(cur_len))
                 next_token_scores = self.set_scores_to_inf_for_invalid_inputs(next_token_scores, input_ids, disjoint_entities, valid_input, empty_answer, delimiters, eos_token_id, constrained_type, tokenizer)
 
             # Store scores, attentions and hidden_states when required
@@ -2959,8 +2959,8 @@ class GenerationMixin:
 
             next_tokens = torch.multinomial(probs, num_samples=2 * num_beams)
             next_token_scores = torch.gather(next_token_scores, -1, next_tokens)
-            print("next_tokens: {}".format(next_tokens))
-            import pdb; pdb.set_trace
+            #print("next_tokens: {}".format(next_tokens))
+            #import pdb; pdb.set_trace
 
             next_token_scores, _indices = torch.sort(next_token_scores, descending=True, dim=1)
             next_tokens = torch.gather(next_tokens, -1, _indices)
