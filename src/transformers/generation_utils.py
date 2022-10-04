@@ -1338,6 +1338,7 @@ class GenerationMixin:
             )
 
             # 12. run sample
+            print("HI")
             return self.sample(
                 input_ids,
                 logits_processor=logits_processor,
@@ -2151,7 +2152,7 @@ class GenerationMixin:
         empty_answer: Optional[torch.tensor] = None,
         delimiters: Optional[List[int]] = None,
         tokenizer: Optional = None,
-        debug_id: Optional[str] = None
+        debug_id: Optional[str] = None,
         **model_kwargs,
     ) -> Union[SampleOutput, torch.LongTensor]:
         r"""
