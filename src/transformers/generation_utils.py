@@ -1319,6 +1319,7 @@ class GenerationMixin:
             )
 
         elif is_sample_gen_mode:
+            import pdb; pdb.set_trace()
             # 10. prepare logits warper
             logits_warper = self._get_logits_warper(
                 top_k=top_k,
