@@ -1719,8 +1719,7 @@ class GenerationMixin:
                 cscores, cids = [s.item() for s in cscores], [i.item() for i in cids]
                 ctokens = tokenizer.convert_ids_to_tokens(cids)
                 print("Constrained top 5:\n{}\n".format("\n".join([str((cids[i], ctokens[i], cscores[i])) for i in range(len(cscores)) if cscores[i] != -math.inf])))
-        if debug_id == '14618_0':
-            import pdb; pdb.set_trace()
+                import pdb; pdb.set_trace()
         return scores
 
     '''
