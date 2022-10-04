@@ -892,6 +892,7 @@ class GenerationMixin:
         empty_answer: Optional[torch.tensor] = None,
         delimiters: Optional[List[int]] = None,
         tokenizer: Optional = None,
+        debug_id: Optional[str] = None,
         **model_kwargs,
     ) -> Union[GreedySearchOutput, SampleOutput, BeamSearchOutput, BeamSampleOutput, torch.LongTensor]:
         r"""
@@ -1353,6 +1354,7 @@ class GenerationMixin:
                 empty_answer=empty_answer,
                 delimiters=delimiters,
                 tokenizer=tokenizer,
+                debug_id=debug_id,
                 **model_kwargs,
             )
 
@@ -2149,6 +2151,7 @@ class GenerationMixin:
         empty_answer: Optional[torch.tensor] = None,
         delimiters: Optional[List[int]] = None,
         tokenizer: Optional = None,
+        debug_id: Optional[str] = None
         **model_kwargs,
     ) -> Union[SampleOutput, torch.LongTensor]:
         r"""
@@ -2325,7 +2328,8 @@ class GenerationMixin:
             next_token_scores = logits_processor(input_ids, next_token_logits)
             next_token_scores = logits_warper(input_ids, next_token_scores)
             if constrained_type != None and 'entity_input' in constrained_type:
-                #print("\n##### STEP {} #####".format(cur_len))
+                if debug_id == '14618_200':
+                    print("\n##### STEP {} #####".format(cur_len))
                 next_token_scores = self.set_scores_to_inf_for_invalid_inputs(next_token_scores, input_ids, disjoint_entities, valid_input, empty_answer, delimiters, eos_token_id, constrained_type, tokenizer)
 
             # Store scores, attentions and hidden_states when required
