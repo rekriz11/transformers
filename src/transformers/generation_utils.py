@@ -1319,7 +1319,6 @@ class GenerationMixin:
             )
 
         elif is_sample_gen_mode:
-            import pdb; pdb.set_trace()
             # 10. prepare logits warper
             logits_warper = self._get_logits_warper(
                 top_k=top_k,
@@ -2299,9 +2298,6 @@ class GenerationMixin:
         # keep track of which sequences are already finished
         unfinished_sequences = input_ids.new(input_ids.shape[0]).fill_(1)
         cur_len = input_ids.shape[-1]
-
-        if debug_id == '14618_0':
-            import pdb; pdb.set_trace()
 
         this_peer_finished = False  # used by synced_gpus only
         # auto-regressive generation
