@@ -2295,6 +2295,7 @@ class GenerationMixin:
 
         this_peer_finished = False  # used by synced_gpus only
         # auto-regressive generation
+        print("debug_id: {}".format(debug_id))
         while True:
 
             if synced_gpus:
