@@ -1338,7 +1338,6 @@ class GenerationMixin:
             )
 
             # 12. run sample
-            print("HI")
             return self.sample(
                 input_ids,
                 logits_processor=logits_processor,
