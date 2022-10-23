@@ -1365,6 +1365,7 @@ class GenerationMixin:
                 num_beam_hyps_to_keep=num_return_sequences,
             )
             # 11. interleave input_ids with `num_beams` additional sequences per batch
+            import pdb; pdb.set_trace()
             input_ids, model_kwargs = self._expand_inputs_for_generation(
                 input_ids, expand_size=num_beams, is_encoder_decoder=self.config.is_encoder_decoder, **model_kwargs
             )
