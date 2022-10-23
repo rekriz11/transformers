@@ -1682,9 +1682,9 @@ class GenerationMixin:
                 if len(prev_answer) >= 5 or cur_answer == [empty_answer]:
                     ## Allow a max of 5 answers per question, and force the model to move on after outputting empty answer
                     valid_mask_list = [[beam_idx, slot_delim]]
-                elif len(cur_answer) >= 8:
-                    ## Force the model to end the answer if it's 10 subwords long
-                    valid_mask_list = [[beam_idx, answer_delim]]
+                #elif len(cur_answer) >= 8:
+                #    ## Force the model to end the answer if it's 10 subwords long
+                #    valid_mask_list = [[beam_idx, answer_delim]]
                 real_next_id = torch.argmax(scores[beam_idx], dim=-1).item()
                 if real_next_id == single_new_line:
                     ## IF the most likely next token is a single new line, only allow the slot delim (to ensure proper formatting of Q/A pairs)
@@ -2241,7 +2241,7 @@ class GenerationMixin:
             next_tokens_scores = logits_processor(input_ids, next_token_logits)
             ## Added function for constrained decoding
             if constrained_type == 'template_questions':
-                print("\n#####STEP {}####".format(step))
+                #print("\n#####STEP {}####".format(step))
                 next_tokens_scores = self.set_scores_to_inf_for_invalid_questions(next_tokens_scores, input_ids, \
                     slot_constraints, empty_answer, delimiters, eos_token_id, input_length, tokenizer)
             elif constrained_type == 'template_input':
