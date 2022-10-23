@@ -2241,7 +2241,7 @@ class GenerationMixin:
             next_tokens_scores = logits_processor(input_ids, next_token_logits)
             ## Added function for constrained decoding
             if constrained_type == 'template_questions':
-                #print("\n#####STEP {}####".format(step))
+                print("\n#####STEP {}####".format(step))
                 next_tokens_scores = self.set_scores_to_inf_for_invalid_questions(next_tokens_scores, input_ids, \
                     slot_constraints, empty_answer, delimiters, eos_token_id, input_length, tokenizer)
             elif constrained_type == 'template_input':
