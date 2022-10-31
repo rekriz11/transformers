@@ -2019,7 +2019,7 @@ class GenerationMixin:
                         finished = [v for v in valid_cands_step if len(v) == len(cur_answer)]
                         if finished != []:
                             valid_mask_list.append([beam_idx, answer_delim])
-                if valid_mask_list == []:
+                if valid_mask_list == [] and beam_idx == 0:
                     print("ERROR, no valid next steps!!")
                     import pdb; pdb.set_trace()
             elif forced_slot[beam_idx]:
@@ -2045,7 +2045,7 @@ class GenerationMixin:
                         import pdb; pdb.set_trace()
         
             #if forced_answer[beam_idx]:
-            if True:
+            '''if True:
                 print("\nbeam_idx: {}".format(beam_idx))
                 prev_ids = input_ids[beam_idx][input_length:].tolist()
                 prev_tokens = tokenizer.convert_ids_to_tokens(prev_ids)
@@ -2059,8 +2059,8 @@ class GenerationMixin:
                 constrained_score = scores[beam_idx][constrained_next_id].item()
                 constrained_next_token = tokenizer.convert_ids_to_tokens(constrained_next_id)
                 print("Constrained next id: {}, token: {}, score: {}".format(constrained_next_id, constrained_next_token, constrained_score))
-            '''else:
-            scores = self.mask_vocab(scores, beam_idx, valid_mask_list)'''
+            else:'''
+            scores = self.mask_vocab(scores, beam_idx, valid_mask_list)
         import pdb; pdb.set_trace()
         return scores
 
