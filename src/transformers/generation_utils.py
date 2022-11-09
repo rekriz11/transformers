@@ -1962,8 +1962,7 @@ class GenerationMixin:
             if len(input_ids) > 1 and input_ids[beam_idx][input_length:].tolist().count(slot_delim) >= len(slot_constraints):
                 ## If we've gotten to the point where we've generated as many slot delimiters 
                 ## as constraints, we should mask everything
-                print("Only allow EOS token for beam_idx {}".format(beam_idx))
-                #import pdb; pdb.set_trace()
+                ## print("Only allow EOS token for beam_idx {}".format(beam_idx))
                 scores = self.mask_vocab(scores, beam_idx, [[beam_idx, eos_token_id]])
                 continue
             valid_mask_list = []
@@ -2050,7 +2049,7 @@ class GenerationMixin:
                         import pdb; pdb.set_trace()
         
             #if forced_answer[beam_idx]:
-            if True:
+            '''if True:
                 print("\nbeam_idx: {}".format(beam_idx))
                 prev_ids = input_ids[beam_idx][input_length:].tolist()
                 prev_tokens = tokenizer.convert_ids_to_tokens(prev_ids)
@@ -2065,7 +2064,7 @@ class GenerationMixin:
                 constrained_next_token = tokenizer.convert_ids_to_tokens(constrained_next_id)
                 print("Constrained next id: {}, token: {}, score: {}".format(constrained_next_id, constrained_next_token, constrained_score))
             '''
-            scores = self.mask_vocab(scores, beam_idx, valid_mask_list)'''
+            scores = self.mask_vocab(scores, beam_idx, valid_mask_list)
         return scores
 
     def greedy_search(
@@ -2803,7 +2802,7 @@ class GenerationMixin:
                 next_tokens_scores = self.set_scores_to_inf_for_invalid_inputs(next_token_scores_processed, input_ids, \
                     slot_constraints, valid_input, empty_answer, delimiters, eos_token_id, input_length, tokenizer)
             elif constrained_type == 'template_candidates':
-                print("\n\n#####STEP {}####".format(step))
+                #print("\n\n#####STEP {}####".format(step))
                 next_tokens_scores = self.set_scores_to_inf_for_invalid_candidates(next_token_scores_processed, input_ids, \
                     slot_constraints, valid_candidates, empty_answer, delimiters, eos_token_id, input_length, tokenizer)
             next_token_scores = next_token_scores_processed + beam_scores[:, None].expand_as(next_token_scores)
