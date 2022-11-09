@@ -2866,8 +2866,8 @@ class GenerationMixin:
             # increase cur_len
             cur_len = cur_len + 1
 
-            import pdb; pdb.set_trace()
-            if beam_scorer.is_done or stopping_criteria(input_ids, scores):
+            ## Adds check to just stop if there aren't any more valid beams 
+            if beam_scorer.is_done or stopping_criteria(input_ids, scores) or max(beam_scores) == -math.inf:
                 if not synced_gpus:
                     break
                 else:
