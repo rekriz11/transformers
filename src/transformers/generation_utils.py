@@ -2066,7 +2066,6 @@ class GenerationMixin:
                 print("Constrained next id: {}, token: {}, score: {}".format(constrained_next_id, constrained_next_token, constrained_score))
             '''
             scores = self.mask_vocab(scores, beam_idx, valid_mask_list)'''
-        import pdb; pdb.set_trace()
         return scores
 
     def greedy_search(
@@ -2867,6 +2866,7 @@ class GenerationMixin:
             # increase cur_len
             cur_len = cur_len + 1
 
+            import pdb; pdb.set_trace()
             if beam_scorer.is_done or stopping_criteria(input_ids, scores):
                 if not synced_gpus:
                     break
