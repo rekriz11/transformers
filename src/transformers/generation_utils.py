@@ -1959,7 +1959,7 @@ class GenerationMixin:
                     answer_delim, prev_answers, cur_answers, beam_idx)
         ## Determines valid next steps
         for beam_idx, (cur_slot, cur_answer, prev_answer) in enumerate(zip(cur_slots, cur_answers, prev_answers)):
-            if len(input_ids) > 1 and input_ids[beam_idx].tolist().count(slot_delim) >= len(slot_constraints):
+            if len(input_ids) > 1 and input_ids[beam_idx][input_length:].tolist().count(slot_delim) >= len(slot_constraints):
                 ## If we've gotten to the point where we've generated as many slot delimiters 
                 ## as constraints, we should mask everything
                 print("Mask everything for beam_idx {}".format(beam_idx))
