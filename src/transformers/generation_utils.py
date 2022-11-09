@@ -1962,9 +1962,9 @@ class GenerationMixin:
             if len(input_ids) > 1 and input_ids[beam_idx][input_length:].tolist().count(slot_delim) >= len(slot_constraints):
                 ## If we've gotten to the point where we've generated as many slot delimiters 
                 ## as constraints, we should mask everything
-                print("Mask everything for beam_idx {}".format(beam_idx))
-                import pdb; pdb.set_trace()
-                scores = self.mask_vocab(scores, beam_idx, [])
+                print("Only allow EOS token for beam_idx {}".format(beam_idx))
+                #import pdb; pdb.set_trace()
+                scores = self.mask_vocab(scores, beam_idx, [[beam_idx, eos_token_id]])
                 continue
             valid_mask_list = []
             ## Removes any duplicate beams from consideration (to avoid repeat candidates)
