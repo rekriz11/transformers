@@ -1291,9 +1291,7 @@ class GenerationMixin:
         stopping_criteria = self._get_stopping_criteria(
             max_length=max_length, max_time=max_time, stopping_criteria=stopping_criteria
         )
-
-        import pdb; pdb.set_trace()
-
+        
         # 9. go into different generation modes
         if is_greedy_gen_mode:
             if num_return_sequences > 1:
