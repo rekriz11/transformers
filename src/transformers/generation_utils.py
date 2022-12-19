@@ -658,6 +658,8 @@ class GenerationMixin:
         # instantiate warpers list
         warpers = LogitsProcessorList()
 
+        import pdb; pdb.set_trace()
+
         # the following idea is largely copied from this PR: https://github.com/huggingface/transformers/pull/5420/files
         # all samplers can be found in `generation_utils_samplers.py`
         if temperature is not None and temperature != 1.0:
@@ -1291,7 +1293,7 @@ class GenerationMixin:
         stopping_criteria = self._get_stopping_criteria(
             max_length=max_length, max_time=max_time, stopping_criteria=stopping_criteria
         )
-        
+
         # 9. go into different generation modes
         if is_greedy_gen_mode:
             if num_return_sequences > 1:
