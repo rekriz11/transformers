@@ -658,7 +658,7 @@ class GenerationMixin:
         # instantiate warpers list
         warpers = LogitsProcessorList()
 
-        import pdb; pdb.set_trace()
+        #import pdb; pdb.set_trace()
 
         # the following idea is largely copied from this PR: https://github.com/huggingface/transformers/pull/5420/files
         # all samplers can be found in `generation_utils_samplers.py`
