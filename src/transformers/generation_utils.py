@@ -2179,11 +2179,18 @@ class GenerationMixin:
             real_next_tokens = [tokenizer.convert_ids_to_tokens(i) for i in real_next_ids]
 
             next_dict = {}
-            for (idx, score, token) in zip(real_next_ids, real_scores, real_next_tokens):
-                try:
-                    next_dict[(token, score)] += 1
-                except KeyError:
-                    next_dict[(token, score)] = 1
+            for (inputx, idx, score, token) in zip(input_ids, real_next_ids, real_scores, real_next_tokens):
+                if eos_token_id not in inputx:
+                    try:
+                        next_dict[(token, score)] += 1
+                    except KeyError:
+                        next_dict[(token, score)] = 1
+                else:
+                    try:
+                        next_dict['DONE'] += 1
+                    except KeyError:
+                        next_dict['DONE'] = 1
+
             print("\nMost likely next tokens and probs: {}".format(next_dict))
             import pdb; pdb.set_trace()
             #print("\nNext id: {}, token: {}, prob: {}".format(real_next_id, real_next_token, real_score))
