@@ -658,8 +658,6 @@ class GenerationMixin:
         # instantiate warpers list
         warpers = LogitsProcessorList()
 
-        #import pdb; pdb.set_trace()
-
         # the following idea is largely copied from this PR: https://github.com/huggingface/transformers/pull/5420/files
         # all samplers can be found in `generation_utils_samplers.py`
         if temperature is not None and temperature != 1.0:
@@ -2106,6 +2104,8 @@ class GenerationMixin:
         unfinished_sequences = input_ids.new(input_ids.shape[0]).fill_(1)
         cur_len = input_ids.shape[-1]
 
+        import pdb; pdb.set_trace()
+
         this_peer_finished = False  # used by synced_gpus only
         # auto-regressive generation
         while True:
@@ -2137,6 +2137,7 @@ class GenerationMixin:
 
             next_token_logits = outputs.logits[:, -1, :]
 
+            import pdb; pdb.set_trace()
             # pre-process distribution
             next_token_scores = logits_processor(input_ids, next_token_logits)
             next_token_scores = logits_warper(input_ids, next_token_scores)
@@ -2144,6 +2145,16 @@ class GenerationMixin:
                 #if debug_id == '14618_2':
                 #    print("\n##### STEP {} #####".format(cur_len))
                 next_token_scores = self.set_scores_to_inf_for_invalid_inputs(next_token_scores, input_ids, disjoint_entities, valid_input, empty_answer, delimiters, eos_token_id, constrained_type, tokenizer, debug_id)
+
+            real_next_id = torch.argmax(scores[0], dim=-1).item()
+            real_score = scores[0][real_next_id].item()
+            real_next_token = tokenizer.convert_ids_to_tokens(real_next_id)
+            print("Real next id: {}, token: {}, real_score: {}".format(real_next_id, real_next_token, real_score))
+            rscores, rids = torch.topk(scores[0], 20, dim=-1, largest=True, sorted=True)
+            rscores, rids = [s.item() for s in rscores], [i.item() for i in rids]
+            rtokens = tokenizer.convert_ids_to_tokens(rids)
+            print("Original top 20:\n{}\n".format("\n".join([str((rids[i], rtokens[i], rscores[i])) for i in range(len(rscores))])))
+            import pdb; pdb.set_trace()
 
             # Store scores, attentions and hidden_states when required
             if return_dict_in_generate:
@@ -2166,6 +2177,8 @@ class GenerationMixin:
             # sample
             probs = nn.functional.softmax(next_token_scores, dim=-1)
             next_tokens = torch.multinomial(probs, num_samples=1).squeeze(1)
+
+            import pdb; pdb.set_trace()
 
             # finished sentences should have their next token be a padding token
             if eos_token_id is not None:
