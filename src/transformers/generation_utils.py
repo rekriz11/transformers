@@ -2194,7 +2194,7 @@ class GenerationMixin:
             inputs_so_far = {}
             for idx in range(input_ids.shape[0]):
                 ids = input_ids[idx].tolist()
-                tokens = ' '.join(tokenizer.convert_ids_to_tokens(ids))
+                tokens = ' '.join(tokenizer.convert_ids_to_tokens([i for i in ids if i != pad_token_id]))
                 try:
                     inputs_so_far[tokens] += 1
                 except KeyError:
