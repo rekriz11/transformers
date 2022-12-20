@@ -2174,9 +2174,17 @@ class GenerationMixin:
             probs = nn.functional.softmax(next_token_scores, dim=-1)
             next_tokens = torch.multinomial(probs, num_samples=1).squeeze(1)
 
-            real_next_id = torch.argmax(probs[0], dim=-1).item()
-            real_score = probs[0][real_next_id].item()
-            real_next_token = tokenizer.convert_ids_to_tokens(real_next_id)
+            real_next_ids = [torch.argmax(p, dim=-1).item() for p in probs]
+            real_scores = [probs[i][real_next_ids[i]].item() for i in range(len(real_next_ids))]
+            real_next_tokens = [tokenizer.convert_ids_to_tokens(i) for i in real_next_ids]
+
+            next_dict = {}
+            for (idx, score, token) in zip(real_next_ids, real_scores, real_next_tokens):
+                try:
+                    next_dict[(token, score)] += 1
+                except KeyError:
+                    next_dict[(token, score)] = 1
+            print("\nNext tokens and probs: {}".format(next_dict))
             #print("\nNext id: {}, token: {}, prob: {}".format(real_next_id, real_next_token, real_score))
             rscores, rids = torch.topk(probs[0], 5, dim=-1, largest=True, sorted=True)
             rscores, rids = [s.item() for s in rscores], [i.item() for i in rids]
@@ -2199,7 +2207,7 @@ class GenerationMixin:
                     inputs_so_far[tokens] += 1
                 except KeyError:
                     inputs_so_far[tokens] = 1
-            print("\nInputs so far at time step {}: {}".format(cur_len, inputs_so_far))
+            print("Inputs so far at time step {}: {}".format(cur_len, inputs_so_far))
 
             model_kwargs = self._update_model_kwargs_for_generation(
                 outputs, model_kwargs, is_encoder_decoder=self.config.is_encoder_decoder
