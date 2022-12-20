@@ -2184,9 +2184,6 @@ class GenerationMixin:
             print("Original top 20:\n{}\n".format("\n".join([str((rids[i], rtokens[i], rscores[i])) for i in range(len(rscores))])))
             import pdb; pdb.set_trace()
 
-
-            import pdb; pdb.set_trace()
-
             # finished sentences should have their next token be a padding token
             if eos_token_id is not None:
                 if pad_token_id is None:
