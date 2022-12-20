@@ -2192,7 +2192,7 @@ class GenerationMixin:
             # update generated ids, model inputs, and length for next step
             input_ids = torch.cat([input_ids, next_tokens[:, None]], dim=-1)
 
-            inputs_so_far = []
+            inputs_so_far = {}
             for idx in input_ids.shape()[0]:
                 ids = input_ids[idx].tolist()
                 tokens = ' '.join(tokenizer.convert_ids_to_tokens(ids))
