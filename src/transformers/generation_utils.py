@@ -2191,7 +2191,8 @@ class GenerationMixin:
                     except KeyError:
                         next_dict['DONE'] = 1
 
-            print("\nMost likely next tokens and probs: {}".format(next_dict))
+            print("\n#### TIME STEP {} ####".format(cur_len))
+            print("Most likely next tokens and probs: {}".format(next_dict))
             #print("\nNext id: {}, token: {}, prob: {}".format(real_next_id, real_next_token, real_score))
             rscores, rids = torch.topk(probs[0], 5, dim=-1, largest=True, sorted=True)
             rscores, rids = [s.item() for s in rscores], [i.item() for i in rids]
