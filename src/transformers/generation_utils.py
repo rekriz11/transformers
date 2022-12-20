@@ -2199,7 +2199,7 @@ class GenerationMixin:
                     inputs_so_far[tokens] += 1
                 except KeyError:
                     inputs_so_far[tokens] = 1
-            print("Inputs so far at time step {}: {}".format(cur_len, inputs_so_far))
+            print("\nInputs so far at time step {}: {}".format(cur_len, inputs_so_far))
 
             model_kwargs = self._update_model_kwargs_for_generation(
                 outputs, model_kwargs, is_encoder_decoder=self.config.is_encoder_decoder
