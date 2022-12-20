@@ -2175,7 +2175,7 @@ class GenerationMixin:
             next_tokens = torch.multinomial(probs, num_samples=1).squeeze(1)
 
             real_next_ids = [torch.argmax(p, dim=-1).item() for p in probs]
-            real_scores = [probs[i][real_next_ids[i]].item() for i in range(len(real_next_ids))]
+            real_scores = [round(probs[i][real_next_ids[i]].item(), 4) for i in range(len(real_next_ids))]
             real_next_tokens = [tokenizer.convert_ids_to_tokens(i) for i in real_next_ids]
 
             next_dict = {}
@@ -2184,7 +2184,7 @@ class GenerationMixin:
                     next_dict[(token, score)] += 1
                 except KeyError:
                     next_dict[(token, score)] = 1
-            print("\nNext tokens and probs: {}".format(next_dict))
+            print("\nMost likely next tokens and probs: {}".format(next_dict))
             #print("\nNext id: {}, token: {}, prob: {}".format(real_next_id, real_next_token, real_score))
             rscores, rids = torch.topk(probs[0], 5, dim=-1, largest=True, sorted=True)
             rscores, rids = [s.item() for s in rscores], [i.item() for i in rids]
