@@ -2183,8 +2183,6 @@ class GenerationMixin:
             rtokens = tokenizer.convert_ids_to_tokens(rids)
             print("Top 10:\n{}\n".format("\n".join([str((rids[i], rtokens[i], rscores[i])) for i in range(len(rscores))])))
 
-            import pdb; pdb.set_trace()
-
             # finished sentences should have their next token be a padding token
             if eos_token_id is not None:
                 if pad_token_id is None:
@@ -2193,6 +2191,18 @@ class GenerationMixin:
 
             # update generated ids, model inputs, and length for next step
             input_ids = torch.cat([input_ids, next_tokens[:, None]], dim=-1)
+
+            inputs_so_far = []
+            for idx in input_ids.shape()[0]:
+                ids = input_ids[idx].tolist()
+                tokens = ' '.join(tokenizer.convert_ids_to_tokens(ids))
+                try:
+                    inputs_so_far[tokens] += 1
+                except KeyError:
+                    inputs_so_far[tokens] = 1
+            print("Inputs so far: {}".format(inputs_so_far))
+            import pdb; pdb.set_trace()
+
             model_kwargs = self._update_model_kwargs_for_generation(
                 outputs, model_kwargs, is_encoder_decoder=self.config.is_encoder_decoder
             )
