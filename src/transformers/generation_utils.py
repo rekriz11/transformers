@@ -2143,15 +2143,14 @@ class GenerationMixin:
                 #    print("\n##### STEP {} #####".format(cur_len))
                 next_token_scores = self.set_scores_to_inf_for_invalid_inputs(next_token_scores, input_ids, disjoint_entities, valid_input, empty_answer, delimiters, eos_token_id, constrained_type, tokenizer, debug_id)
 
-            #real_next_id = torch.argmax(next_token_scores[0], dim=-1).item()
-            #real_score = next_token_scores[0][real_next_id].item()
-            #real_next_token = tokenizer.convert_ids_to_tokens(real_next_id)
-            #print("Real next id: {}, token: {}, real_score: {}".format(real_next_id, real_next_token, real_score))
-            #rscores, rids = torch.topk(next_token_scores[0], 20, dim=-1, largest=True, sorted=True)
-            #rscores, rids = [s.item() for s in rscores], [i.item() for i in rids]
-            #rtokens = tokenizer.convert_ids_to_tokens(rids)
-            #print("Original top 20:\n{}\n".format("\n".join([str((rids[i], rtokens[i], rscores[i])) for i in range(len(rscores))])))
-            #import pdb; pdb.set_trace()
+            real_next_id = torch.argmax(next_token_scores[0], dim=-1).item()
+            real_score = next_token_scores[0][real_next_id].item()
+            real_next_token = tokenizer.convert_ids_to_tokens(real_next_id)
+            print("Real next id: {}, token: {}, real_score: {}".format(real_next_id, real_next_token, real_score))
+            rscores, rids = torch.topk(next_token_scores[0], 20, dim=-1, largest=True, sorted=True)
+            rscores, rids = [s.item() for s in rscores], [i.item() for i in rids]
+            rtokens = tokenizer.convert_ids_to_tokens(rids)
+            print("Original top 20:\n{}\n".format("\n".join([str((rids[i], rtokens[i], rscores[i])) for i in range(len(rscores))])))
 
             # Store scores, attentions and hidden_states when required
             if return_dict_in_generate:
@@ -2178,7 +2177,7 @@ class GenerationMixin:
             real_next_id = torch.argmax(probs[0], dim=-1).item()
             real_score = probs[0][real_next_id].item()
             real_next_token = tokenizer.convert_ids_to_tokens(real_next_id)
-            print("Real next id: {}, token: {}, real_score: {}".format(real_next_id, real_next_token, real_score))
+            print("\n\nReal next id: {}, token: {}, real_prob: {}".format(real_next_id, real_next_token, real_score))
             rscores, rids = torch.topk(probs[0], 20, dim=-1, largest=True, sorted=True)
             rscores, rids = [s.item() for s in rscores], [i.item() for i in rids]
             rtokens = tokenizer.convert_ids_to_tokens(rids)
