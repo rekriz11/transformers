@@ -2171,6 +2171,7 @@ class GenerationMixin:
                     )
 
             # sample
+            import pdb; pdb.set_trace()
             probs = nn.functional.softmax(next_token_scores, dim=-1)
             next_tokens = torch.multinomial(probs, num_samples=1).squeeze(1)
 
