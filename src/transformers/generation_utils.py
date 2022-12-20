@@ -2192,7 +2192,7 @@ class GenerationMixin:
                         next_dict['DONE'] = 1
 
             print("\n#### TIME STEP {} ####".format(cur_len))
-            print("Most likely next tokens and probs: {}".format(next_dict))
+            print("Most likely next tokens: {}".format(next_dict))
             #print("\nNext id: {}, token: {}, prob: {}".format(real_next_id, real_next_token, real_score))
             rscores, rids = torch.topk(probs[0], 5, dim=-1, largest=True, sorted=True)
             rscores, rids = [s.item() for s in rscores], [i.item() for i in rids]
@@ -2215,7 +2215,7 @@ class GenerationMixin:
                     inputs_so_far[tokens] += 1
                 except KeyError:
                     inputs_so_far[tokens] = 1
-            print("Inputs so far at time step {}: {}".format(cur_len, inputs_so_far))
+            print("Sampled inputs so far: {}".format(inputs_so_far))
 
             model_kwargs = self._update_model_kwargs_for_generation(
                 outputs, model_kwargs, is_encoder_decoder=self.config.is_encoder_decoder
