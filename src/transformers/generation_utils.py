@@ -2191,7 +2191,7 @@ class GenerationMixin:
 
             # update generated ids, model inputs, and length for next step
             input_ids = torch.cat([input_ids, next_tokens[:, None]], dim=-1)
-
+            import pdb; pdb.set_trace()
             inputs_so_far = {}
             for idx in input_ids.shape[0]:
                 ids = input_ids[idx].tolist()
